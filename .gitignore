@@ -1,8 +1,0 @@
-node_modules
-*.log
-*.ldif
-*.tar*
-docs/pkg
-.nyc_output
-coverage
-package-lock.json

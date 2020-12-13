@@ -3,7 +3,7 @@
 <head>
     <title>ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="media/css/restdown.css">
+    <link rel="stylesheet" type="text/css" href="media/css/style.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 </head>
 <body>
@@ -29,38 +29,54 @@
 <div>Contents</div>
 </span>
 <ul>
-  <li><div><a href="#features">Features</a></div></li>
-  <li><div><a href="#getting-started">Getting started</a></div></li>
-  <li><div><a href="#more-information">More information</a></div></li>
-  <li><div><a href="#whats-not-in-the-box">What's not in the box?</a></div></li>
+<li>
+<div>
+<a href="#features">Features</a>
+</div>
+</li>
+<li>
+<div>
+<a href="#getting-started">Getting started</a>
+</div>
+</li>
+<li>
+<div>
+<a href="#more-information">More information</a>
+</div>
+</li>
+<li>
+<div>
+<a href="#whats-not-in-the-box">What's not in the box?</a>
+</div>
+</li>
 </ul>
 
 </div>
-    <div id="content">
+
+<div id="content">
 <div id="indextagline">
 Reimagining <a href="http://tools.ietf.org/html/rfc4510" id="indextaglink">LDAP</a> for <a id="indextaglink" href="http://nodejs.org">Node.js</a>
 </div>
 
-
-<h1>Overview</h1>
+<h1 id="overview">Overview</h1>
 <div class="intro">
-
 
 <p>ldapjs is a pure JavaScript, from-scratch framework for implementing
 <a href="http://tools.ietf.org/html/rfc4510">LDAP</a> clients and servers in
 <a href="http://nodejs.org">Node.js</a>.  It is intended for developers used to interacting
 with HTTP services in node and <a href="http://restify.com">restify</a>.</p>
+</div>
 
-<pre><code>var ldap = require('ldapjs');
+<pre><code>var ldap = require(&#39;ldapjs&#39;);
 
 var server = ldap.createServer();
 
-server.search('o=example', function(req, res, next) {
+server.search(&#39;o=example&#39;, function(req, res, next) {
   var obj = {
     dn: req.dn.toString(),
     attributes: {
-      objectclass: ['organization', 'top'],
-      o: 'example'
+      objectclass: [&#39;organization&#39;, &#39;top&#39;],
+      o: &#39;example&#39;
     }
   };
 
@@ -71,93 +87,73 @@ server.search('o=example', function(req, res, next) {
 });
 
 server.listen(1389, function() {
-  console.log('LDAP server listening at %s', server.url);
-});
-</code></pre>
-
+  console.log(&#39;LDAP server listening at %s&#39;, server.url);
+});</code></pre>
 <p>Try hitting that with:</p>
-
-<pre class="shell"><code>ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*
-</code></pre>
-
-
-</div>
+<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*</code></pre>
 <h1 id="features">Features</h1>
-
 <p>ldapjs implements most of the common operations in the LDAP v3 RFC(s), for
 both client and server.  It is 100% wire-compatible with the LDAP protocol
 itself, and is interoperable with <a href="http://openldap.org">OpenLDAP</a> and any other
 LDAPv3-compliant implementation.  ldapjs gives you a powerful routing and
-"intercepting filter" pattern for implementing server(s).  It is intended
+&quot;intercepting filter&quot; pattern for implementing server(s).  It is intended
 that you can build LDAP over anything you want, not just traditional databases.</p>
-
 <h1 id="getting-started">Getting started</h1>
-
-<pre class="shell"><code>npm install ldapjs
-</code></pre>
-
-<p>If you're new to LDAP, check out the <a href="guide.html">guide</a>.  Otherwise, the
+<pre><code>$ npm install ldapjs</code></pre>
+<p>If you&#39;re new to LDAP, check out the <a href="guide.html">guide</a>.  Otherwise, the
 API documentation is:</p>
-
 <table>
 <thead>
 <tr>
-  <th>Section</th>
-  <th>Content</th>
+<th>Section</th>
+<th>Content</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-  <td><a href="server.html">Server API</a></td>
-  <td>Reference for implementing LDAP servers.</td>
+<tbody><tr>
+<td><a href="server.html">Server API</a></td>
+<td>Reference for implementing LDAP servers.</td>
 </tr>
 <tr>
-  <td><a href="client.html">Client API</a></td>
-  <td>Reference for implementing LDAP clients.</td>
+<td><a href="client.html">Client API</a></td>
+<td>Reference for implementing LDAP clients.</td>
 </tr>
 <tr>
-  <td><a href="dn.html">DN API</a></td>
-  <td>API reference for the DN class.</td>
+<td><a href="dn.html">DN API</a></td>
+<td>API reference for the DN class.</td>
 </tr>
 <tr>
-  <td><a href="filters.html">Filter API</a></td>
-  <td>API reference for LDAP search filters.</td>
+<td><a href="filters.html">Filter API</a></td>
+<td>API reference for LDAP search filters.</td>
 </tr>
 <tr>
-  <td><a href="errors.html">Error API</a></td>
-  <td>Listing of all ldapjs Error objects.</td>
+<td><a href="errors.html">Error API</a></td>
+<td>Listing of all ldapjs Error objects.</td>
 </tr>
 <tr>
-  <td><a href="examples.html">Examples</a></td>
-  <td>Collection of sample/getting started code.</td>
+<td><a href="examples.html">Examples</a></td>
+<td>Collection of sample/getting started code.</td>
 </tr>
-</tbody>
-</table>
-
+</tbody></table>
 <h1 id="more-information">More information</h1>
-
 <ul>
 <li>License:<a href="http://opensource.org/licenses/mit-license.php">MIT</a></li>
-<li>Code: <a href="https://github.com/ldapjs/node-ldapjs">ldapjs/node-ldapjs</a></li>
-<li>node.js version: &gt;=10.13.0</li>
+<li>Code: <a href="https://github.com/mcavage/node-ldapjs">mcavage/node-ldapjs</a></li>
+<li>node.js version: &gt;=0.8</li>
+<li>Twitter: <a href="http://twitter.com/pfmooney">@pfmooney</a></li>
 </ul>
-
-<h1 id="whats-not-in-the-box">What's not in the box?</h1>
-
+<h1 id="whats-not-in-the-box">What&#39;s not in the box?</h1>
 <p>Since most developers and system(s) adminstrators struggle with some of the
 esoteric features of LDAP, not all features in LDAP are implemented here.
 Specifically:</p>
-
 <ul>
 <li>LDIF</li>
 <li>Aliases</li>
 <li>Attributes by OID</li>
 <li>Extensible matching</li>
 </ul>
+<p>There are a few others, but those are the &quot;big&quot; ones.</p>
+</div><!-- end #content -->
 
-<p>There are a few others, but those are the "big" ones.</p>
-
-    </div> <!-- #content -->
 <script type="text/javascript" charset="utf-8">
 $(function() {
     var headerHeight = $("#header").height();

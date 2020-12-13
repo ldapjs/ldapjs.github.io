@@ -3,7 +3,7 @@
 <head>
     <title>Examples | ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="media/css/restdown.css">
+    <link rel="stylesheet" type="text/css" href="media/css/style.css">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 </head>
 <body>
@@ -29,26 +29,35 @@
 <div>Contents</div>
 </span>
 <ul>
-  <li><div><a href="#in-memory-server">In-memory server</a></div></li>
-  <li><div><a href="#etcpasswd-server">/etc/passwd server</a></div></li>
-  <li><div><a href="#address-book">Address Book</a></div></li>
+<li>
+<div>
+<a href="#in-memory-server">In-memory server</a>
+</div>
+</li>
+<li>
+<div>
+<a href="#etcpasswd-server">/etc/passwd server</a>
+</div>
+</li>
+<li>
+<div>
+<a href="#address-book">Address Book</a>
+</div>
+</li>
 </ul>
 
 </div>
-    <div id="content">
 
-<h1>ldapjs Examples</h1>
+<div id="content">
+<h1 id="ldapjs-examples">ldapjs Examples</h1>
 <div class="intro">
-
 
 <p>This page contains a (hopefully) growing list of sample code to get you started
 with ldapjs.</p>
-
-
 </div>
-<h1 id="in-memory-server">In-memory server</h1>
 
-<pre><code>var ldap = require('ldapjs');
+<h1 id="in-memory-server">In-memory server</h1>
+<pre><code>var ldap = require(&#39;ldapjs&#39;);
 
 
 ///--- Shared handlers
@@ -56,7 +65,7 @@ with ldapjs.</p>
 function authorize(req, res, next) {
   /* Any user may search after bind, only cn=root has full power */
   var isSearch = (req instanceof ldap.SearchRequest);
-  if (!req.connection.ldap.bindDN.equals('cn=root') &amp;&amp; !isSearch)
+  if (!req.connection.ldap.bindDN.equals(&#39;cn=root&#39;) &amp;&amp; !isSearch)
     return next(new ldap.InsufficientAccessRightsError());
 
   return next();
@@ -65,14 +74,14 @@ function authorize(req, res, next) {
 
 ///--- Globals
 
-var SUFFIX = 'o=joyent';
+var SUFFIX = &#39;o=joyent&#39;;
 var db = {};
 var server = ldap.createServer();
 
 
 
-server.bind('cn=root', function(req, res, next) {
-  if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
+server.bind(&#39;cn=root&#39;, function(req, res, next) {
+  if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
     return next(new ldap.InvalidCredentialsError());
 
   res.end();
@@ -96,7 +105,7 @@ server.bind(SUFFIX, function(req, res, next) {
     return next(new ldap.NoSuchObjectError(dn));
 
   if (!db[dn].userpassword)
-    return next(new ldap.NoSuchAttributeError('userPassword'));
+    return next(new ldap.NoSuchAttributeError(&#39;userPassword&#39;));
 
   if (db[dn].userpassword.indexOf(req.credentials) === -1)
     return next(new ldap.InvalidCredentialsError());
@@ -140,7 +149,7 @@ server.del(SUFFIX, authorize, function(req, res, next) {
 server.modify(SUFFIX, authorize, function(req, res, next) {
   var dn = req.dn.toString();
   if (!req.changes.length)
-    return next(new ldap.ProtocolError('changes required'));
+    return next(new ldap.ProtocolError(&#39;changes required&#39;));
   if (!db[dn])
     return next(new ldap.NoSuchObjectError(dn));
 
@@ -149,7 +158,7 @@ server.modify(SUFFIX, authorize, function(req, res, next) {
   for (var i = 0; i &lt; req.changes.length; i++) {
     mod = req.changes[i].modification;
     switch (req.changes[i].operation) {
-    case 'replace':
+    case &#39;replace&#39;:
       if (!entry[mod.type])
         return next(new ldap.NoSuchAttributeError(mod.type));
 
@@ -161,7 +170,7 @@ server.modify(SUFFIX, authorize, function(req, res, next) {
 
       break;
 
-    case 'add':
+    case &#39;add&#39;:
       if (!entry[mod.type]) {
         entry[mod.type] = mod.vals;
       } else {
@@ -173,7 +182,7 @@ server.modify(SUFFIX, authorize, function(req, res, next) {
 
       break;
 
-    case 'delete':
+    case &#39;delete&#39;:
       if (!entry[mod.type])
         return next(new ldap.NoSuchAttributeError(mod.type));
 
@@ -195,7 +204,7 @@ server.search(SUFFIX, authorize, function(req, res, next) {
   var scopeCheck;
 
   switch (req.scope) {
-  case 'base':
+  case &#39;base&#39;:
     if (req.filter.matches(db[dn])) {
       res.send({
         dn: dn,
@@ -206,7 +215,7 @@ server.search(SUFFIX, authorize, function(req, res, next) {
     res.end();
     return next();
 
-  case 'one':
+  case &#39;one&#39;:
     scopeCheck = function(k) {
       if (req.dn.equals(k))
         return true;
@@ -216,7 +225,7 @@ server.search(SUFFIX, authorize, function(req, res, next) {
     };
     break;
 
-  case 'sub':
+  case &#39;sub&#39;:
     scopeCheck = function(k) {
       return (req.dn.equals(k) || req.dn.parentOf(k));
     };
@@ -245,22 +254,19 @@ server.search(SUFFIX, authorize, function(req, res, next) {
 ///--- Fire it up
 
 server.listen(1389, function() {
-  console.log('LDAP server up at: %s', server.url);
-});
-</code></pre>
-
+  console.log(&#39;LDAP server up at: %s&#39;, server.url);
+});</code></pre>
 <h1 id="etcpasswd-server">/etc/passwd server</h1>
-
-<pre><code>var fs = require('fs');
-var ldap = require('ldapjs');
-var spawn = require('child_process').spawn;
+<pre><code>var fs = require(&#39;fs&#39;);
+var ldap = require(&#39;ldapjs&#39;);
+var spawn = require(&#39;child_process&#39;).spawn;
 
 
 
 ///--- Shared handlers
 
 function authorize(req, res, next) {
-  if (!req.connection.ldap.bindDN.equals('cn=root'))
+  if (!req.connection.ldap.bindDN.equals(&#39;cn=root&#39;))
     return next(new ldap.InsufficientAccessRightsError());
 
   return next();
@@ -268,31 +274,31 @@ function authorize(req, res, next) {
 
 
 function loadPasswdFile(req, res, next) {
-  fs.readFile('/etc/passwd', 'utf8', function(err, data) {
+  fs.readFile(&#39;/etc/passwd&#39;, &#39;utf8&#39;, function(err, data) {
     if (err)
       return next(new ldap.OperationsError(err.message));
 
     req.users = {};
 
-    var lines = data.split('\n');
+    var lines = data.split(&#39;\n&#39;);
     for (var i = 0; i &lt; lines.length; i++) {
       if (!lines[i] || /^#/.test(lines[i]))
         continue;
 
-      var record = lines[i].split(':');
+      var record = lines[i].split(&#39;:&#39;);
       if (!record || !record.length)
         continue;
 
       req.users[record[0]] = {
-        dn: 'cn=' + record[0] + ', ou=users, o=myhost',
+        dn: &#39;cn=&#39; + record[0] + &#39;, ou=users, o=myhost&#39;,
         attributes: {
           cn: record[0],
           uid: record[2],
           gid: record[3],
           description: record[4],
           homedirectory: record[5],
-          shell: record[6] || '',
-          objectclass: 'unixUser'
+          shell: record[6] || &#39;&#39;,
+          objectclass: &#39;unixUser&#39;
         }
       };
     }
@@ -310,8 +316,8 @@ var pre = [authorize, loadPasswdFile];
 
 var server = ldap.createServer();
 
-server.bind('cn=root', function(req, res, next) {
-  if (req.dn.toString() !== 'cn=root' || req.credentials !== 'secret')
+server.bind(&#39;cn=root&#39;, function(req, res, next) {
+  if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
     return next(new ldap.InvalidCredentialsError());
 
   res.end();
@@ -319,56 +325,56 @@ server.bind('cn=root', function(req, res, next) {
 });
 
 
-server.add('ou=users, o=myhost', pre, function(req, res, next) {
+server.add(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
   if (!req.dn.rdns[0].cn)
-    return next(new ldap.ConstraintViolationError('cn required'));
+    return next(new ldap.ConstraintViolationError(&#39;cn required&#39;));
 
   if (req.users[req.dn.rdns[0].cn])
     return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
 
   var entry = req.toObject().attributes;
 
-  if (entry.objectclass.indexOf('unixUser') === -1)
-    return next(new ldap.ConstraintViolation('entry must be a unixUser'));
+  if (entry.objectclass.indexOf(&#39;unixUser&#39;) === -1)
+    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));
 
-  var opts = ['-m'];
+  var opts = [&#39;-m&#39;];
   if (entry.description) {
-    opts.push('-c');
+    opts.push(&#39;-c&#39;);
     opts.push(entry.description[0]);
   }
   if (entry.homedirectory) {
-    opts.push('-d');
+    opts.push(&#39;-d&#39;);
     opts.push(entry.homedirectory[0]);
   }
   if (entry.gid) {
-    opts.push('-g');
+    opts.push(&#39;-g&#39;);
     opts.push(entry.gid[0]);
   }
   if (entry.shell) {
-    opts.push('-s');
+    opts.push(&#39;-s&#39;);
     opts.push(entry.shell[0]);
   }
   if (entry.uid) {
-    opts.push('-u');
+    opts.push(&#39;-u&#39;);
     opts.push(entry.uid[0]);
   }
   opts.push(entry.cn[0]);
-  var useradd = spawn('useradd', opts);
+  var useradd = spawn(&#39;useradd&#39;, opts);
 
   var messages = [];
 
-  useradd.stdout.on('data', function(data) {
+  useradd.stdout.on(&#39;data&#39;, function(data) {
     messages.push(data.toString());
   });
-  useradd.stderr.on('data', function(data) {
+  useradd.stderr.on(&#39;data&#39;, function(data) {
     messages.push(data.toString());
   });
 
-  useradd.on('exit', function(code) {
+  useradd.on(&#39;exit&#39;, function(code) {
     if (code !== 0) {
-      var msg = '' + code;
+      var msg = &#39;&#39; + code;
       if (messages.length)
-        msg += ': ' + messages.join();
+        msg += &#39;: &#39; + messages.join();
       return next(new ldap.OperationsError(msg));
     }
 
@@ -378,12 +384,12 @@ server.add('ou=users, o=myhost', pre, function(req, res, next) {
 });
 
 
-server.modify('ou=users, o=myhost', pre, function(req, res, next) {
+server.modify(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
   if (!req.dn.rdns[0].cn || !req.users[req.dn.rdns[0].cn])
     return next(new ldap.NoSuchObjectError(req.dn.toString()));
 
   if (!req.changes.length)
-    return next(new ldap.ProtocolError('changes required'));
+    return next(new ldap.ProtocolError(&#39;changes required&#39;));
 
   var user = req.users[req.dn.rdns[0].cn].attributes;
   var mod;
@@ -391,23 +397,23 @@ server.modify('ou=users, o=myhost', pre, function(req, res, next) {
   for (var i = 0; i &lt; req.changes.length; i++) {
     mod = req.changes[i].modification;
     switch (req.changes[i].operation) {
-    case 'replace':
-      if (mod.type !== 'userpassword' || !mod.vals || !mod.vals.length)
-        return next(new ldap.UnwillingToPerformError('only password updates ' +
-                                                     'allowed'));
+    case &#39;replace&#39;:
+      if (mod.type !== &#39;userpassword&#39; || !mod.vals || !mod.vals.length)
+        return next(new ldap.UnwillingToPerformError(&#39;only password updates &#39; +
+                                                     &#39;allowed&#39;));
       break;
-    case 'add':
-    case 'delete':
-      return next(new ldap.UnwillingToPerformError('only replace allowed'));
+    case &#39;add&#39;:
+    case &#39;delete&#39;:
+      return next(new ldap.UnwillingToPerformError(&#39;only replace allowed&#39;));
     }
   }
 
-  var passwd = spawn('chpasswd', ['-c', 'MD5']);
-  passwd.stdin.end(user.cn + ':' + mod.vals[0], 'utf8');
+  var passwd = spawn(&#39;chpasswd&#39;, [&#39;-c&#39;, &#39;MD5&#39;]);
+  passwd.stdin.end(user.cn + &#39;:&#39; + mod.vals[0], &#39;utf8&#39;);
 
-  passwd.on('exit', function(code) {
+  passwd.on(&#39;exit&#39;, function(code) {
     if (code !== 0)
-      return next(new ldap.OperationsError('' + code));
+      return next(new ldap.OperationsError(&#39;&#39; + code));
 
     res.end();
     return next();
@@ -415,25 +421,25 @@ server.modify('ou=users, o=myhost', pre, function(req, res, next) {
 });
 
 
-server.del('ou=users, o=myhost', pre, function(req, res, next) {
+server.del(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
   if (!req.dn.rdns[0].cn || !req.users[req.dn.rdns[0].cn])
     return next(new ldap.NoSuchObjectError(req.dn.toString()));
 
-  var userdel = spawn('userdel', ['-f', req.dn.rdns[0].cn]);
+  var userdel = spawn(&#39;userdel&#39;, [&#39;-f&#39;, req.dn.rdns[0].cn]);
 
   var messages = [];
-  userdel.stdout.on('data', function(data) {
+  userdel.stdout.on(&#39;data&#39;, function(data) {
     messages.push(data.toString());
   });
-  userdel.stderr.on('data', function(data) {
+  userdel.stderr.on(&#39;data&#39;, function(data) {
     messages.push(data.toString());
   });
 
-  userdel.on('exit', function(code) {
+  userdel.on(&#39;exit&#39;, function(code) {
     if (code !== 0) {
-      var msg = '' + code;
+      var msg = &#39;&#39; + code;
       if (messages.length)
-        msg += ': ' + messages.join();
+        msg += &#39;: &#39; + messages.join();
       return next(new ldap.OperationsError(msg));
     }
 
@@ -443,7 +449,7 @@ server.del('ou=users, o=myhost', pre, function(req, res, next) {
 });
 
 
-server.search('o=myhost', pre, function(req, res, next) {
+server.search(&#39;o=myhost&#39;, pre, function(req, res, next) {
   Object.keys(req.users).forEach(function(k) {
     if (req.filter.matches(req.users[k].attributes))
       res.send(req.users[k]);
@@ -455,19 +461,15 @@ server.search('o=myhost', pre, function(req, res, next) {
 
 
 
-// LDAP "standard" listens on 389, but whatever.
-server.listen(1389, '127.0.0.1', function() {
-  console.log('/etc/passwd LDAP server up at: %s', server.url);
-});
-</code></pre>
-
+// LDAP &quot;standard&quot; listens on 389, but whatever.
+server.listen(1389, &#39;127.0.0.1&#39;, function() {
+  console.log(&#39;/etc/passwd LDAP server up at: %s&#39;, server.url);
+});</code></pre>
 <h1 id="address-book">Address Book</h1>
-
 <p>This example is courtesy of <a href="https://github.com/dresende">Diogo Resende</a> and
 illustrates setting up an address book for typical mail clients such as
 Thunderbird or Evolution over a MySQL database.</p>
-
-<pre><code>// MySQL test: (create on database 'abook' with username 'abook' and password 'abook')
+<pre><code>// MySQL test: (create on database &#39;abook&#39; with username &#39;abook&#39; and password &#39;abook&#39;)
 //
 // CREATE TABLE IF NOT EXISTS `users` (
 //   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
@@ -477,7 +479,7 @@ Thunderbird or Evolution over a MySQL database.</p>
 //   KEY `username` (`username`)
 // ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 // INSERT INTO `users` (`username`, `password`) VALUES
-// ('demo', 'demo');
+// (&#39;demo&#39;, &#39;demo&#39;);
 // CREATE TABLE IF NOT EXISTS `contacts` (
 //   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
 //   `user_id` int(5) unsigned NOT NULL,
@@ -487,52 +489,52 @@ Thunderbird or Evolution over a MySQL database.</p>
 //   KEY `user_id` (`user_id`)
 // ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 // INSERT INTO `contacts` (`user_id`, `name`, `email`) VALUES
-// (1, 'John Doe', 'john.doe@example.com'),
-// (1, 'Jane Doe', 'jane.doe@example.com');
+// (1, &#39;John Doe&#39;, &#39;john.doe@example.com&#39;),
+// (1, &#39;Jane Doe&#39;, &#39;jane.doe@example.com&#39;);
 //
 
-var ldap = require('ldapjs'),
-    mysql = require("mysql"),
+var ldap = require(&#39;ldapjs&#39;),
+    mysql = require(&quot;mysql&quot;),
     server = ldap.createServer(),
     addrbooks = {}, userinfo = {},
     ldap_port = 389,
-    basedn = "dc=example, dc=com",
-    company = "Example",
+    basedn = &quot;dc=example, dc=com&quot;,
+    company = &quot;Example&quot;,
     db = mysql.createClient({
-      user: "abook",
-      password: "abook",
-      database: "abook"
+      user: &quot;abook&quot;,
+      password: &quot;abook&quot;,
+      database: &quot;abook&quot;
     });
 
-db.query("SELECT c.*,u.username,u.password " +
-         "FROM contacts c JOIN users u ON c.user_id=u.id",
+db.query(&quot;SELECT c.*,u.username,u.password &quot; +
+         &quot;FROM contacts c JOIN users u ON c.user_id=u.id&quot;,
          function(err, contacts) {
   if (err) {
-    console.log("Error fetching contacts", err);
+    console.log(&quot;Error fetching contacts&quot;, err);
     process.exit(1);
   }
 
   for (var i = 0; i &lt; contacts.length; i++) {
     if (!addrbooks.hasOwnProperty(contacts[i].username)) {
       addrbooks[contacts[i].username] = [];
-      userinfo["cn=" + contacts[i].username + ", " + basedn] = {
+      userinfo[&quot;cn=&quot; + contacts[i].username + &quot;, &quot; + basedn] = {
         abook: addrbooks[contacts[i].username],
         pwd: contacts[i].password
       };
     }
 
-    var p = contacts[i].name.indexOf(" ");
+    var p = contacts[i].name.indexOf(&quot; &quot;);
     if (p != -1)
       contacts[i].firstname = contacts[i].name.substr(0, p);
 
-    p = contacts[i].name.lastIndexOf(" ");
+    p = contacts[i].name.lastIndexOf(&quot; &quot;);
     if (p != -1)
       contacts[i].surname = contacts[i].name.substr(p + 1);
 
     addrbooks[contacts[i].username].push({
-      dn: "cn=" + contacts[i].name + ", " + basedn,
+      dn: &quot;cn=&quot; + contacts[i].name + &quot;, &quot; + basedn,
       attributes: {
-        objectclass: [ "top" ],
+        objectclass: [ &quot;top&quot; ],
         cn: contacts[i].name,
         mail: contacts[i].email,
         givenname: contacts[i].firstname,
@@ -568,18 +570,14 @@ db.query("SELECT c.*,u.username,u.password " +
   });
 
   server.listen(ldap_port, function() {
-    console.log("Addressbook started at %s", server.url);
+    console.log(&quot;Addressbook started at %s&quot;, server.url);
   });
-});
-</code></pre>
-
+});</code></pre>
 <p>To test out this example, try:</p>
+<pre><code>$ ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
+  -w demo -b &quot;dc=example,dc=com&quot; objectclass=*</code></pre>
+</div><!-- end #content -->
 
-<pre class="shell"><code>ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
-  -w demo -b "dc=example,dc=com" objectclass=*
-</code></pre>
-
-    </div> <!-- #content -->
 <script type="text/javascript" charset="utf-8">
 $(function() {
     var headerHeight = $("#header").height();
