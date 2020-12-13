@@ -423,7 +423,7 @@ Seattle:</p>
 amp <code>&amp;</code>), an <code>equality</code> filter <code>(the l=Seattle)</code>, and a <code>substring</code> filter.
 Substrings are wildcard filters. They use <code>*</code> as the wildcard. You can put more
 than one wildcard for a given string. For example you could do <code>(email=*@*bar.com)</code>
-to match any email of @bar.com or its subdomains like &quot;<a href="mailto:&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#x65;&#64;&#102;&#111;&#111;&#x2e;&#x62;&#x61;&#x72;&#x2e;&#99;&#111;&#109;">&#x65;&#x78;&#x61;&#x6d;&#112;&#108;&#x65;&#64;&#102;&#111;&#111;&#x2e;&#x62;&#x61;&#x72;&#x2e;&#99;&#111;&#109;</a>&quot;.</p>
+to match any email of @bar.com or its subdomains like <code>&quot;example@foo.bar.com&quot;</code>.</p>
 <p>Now, let&#39;s say we also want to set our filter to include a
 specification that either the employeeType <em>not</em> be a manager nor a secretary:</p>
 <pre><code>(&amp;(email=*@bar.com)(l=Seattle)(!(|(employeeType=manager)(employeeType=secretary))))</code></pre>
