@@ -233,7 +233,8 @@ with LDAP. If you&#39;re not, read the <a href="guide.html">guide</a> first.</p>
 
 <h1 id="create-a-server">Create a server</h1>
 <p>The code to create a new server looks like:</p>
-<pre><code>var server = ldap.createServer();</code></pre>
+<pre><code>var server = ldap.createServer();
+</code></pre>
 <p>The full list of options is:</p>
 <p>||log||You can optionally pass in a Bunyan compatible logger instance the client will use to acquire a child logger.||
 ||certificate||A PEM-encoded X.509 certificate; will cause this server to run in TLS mode.||
@@ -270,7 +271,8 @@ available.</p>
 <p>Example:</p>
 <pre><code> server.listen(389, &#39;127.0.0.1&#39;, function() {
    console.log(&#39;LDAP server listening at: &#39; + server.url);
- });</code></pre>
+ });
+</code></pre>
 <h3 id="port-and-host">Port and Host</h3>
 <p><code>listen(port, [host], [callback])</code></p>
 <p>Begin accepting connections on the specified port and host. If the host is
@@ -306,7 +308,8 @@ definition of the route.  For example:</p>
   return next();
 }
 
-server.search(&#39;o=example&#39;, authorize, function(req, res, next) { ... });</code></pre>
+server.search(&#39;o=example&#39;, authorize, function(req, res, next) { ... });
+</code></pre>
 <p>Note that ldapjs is also slightly different, since it&#39;s often going to be backed
 to a DB-like entity, in that it also has an API where you can pass in a
 &#39;backend&#39; object.  This is necessary if there are persistent connection pools,
@@ -331,7 +334,8 @@ var backend = ldapRiak.createBackend({
 server.add(&quot;o=example&quot;,
            backend,
            backend.add());
-...</code></pre>
+...
+</code></pre>
 <p>The first parameter to an ldapjs route is always the point in the
 tree to mount the handler chain at.  The second argument is <em>optionally</em> a
 backend object.  After that you can pass in an arbitrary combination of
@@ -344,7 +348,8 @@ that on express/connect, allowing you to chain up &quot;middleware&quot;:</p>
 <pre><code>server.use(function(req, res, next) {
   console.log(&#39;hello world&#39;);
   return next();
-});</code></pre>
+});
+</code></pre>
 <h2 id="common-request-elements">Common Request Elements</h2>
 <p>All request objects have the <code>dn</code> getter on it, which is &quot;context-sensitive&quot;
 and returns the point in the tree that the operation wants to operate on.  The
@@ -381,7 +386,8 @@ ldapjs will <em>stop</em> calling your handler chain.  For example:</p>
   function(req, res, next) { return next(); },
   function(req, res, next) { return next(new ldap.OperationsError()); },
   function(req, res, next) { res.end(); }
-);</code></pre>
+);
+</code></pre>
 <p>In the code snipped above, the third handler would never get invoked.</p>
 <h1 id="bind">Bind</h1>
 <p>Adds a mount in the tree to perform LDAP binds with. Example:</p>
@@ -389,7 +395,8 @@ ldapjs will <em>stop</em> calling your handler chain.  For example:</p>
   console.log(&#39;bind DN: &#39; + req.dn.toString());
   console.log(&#39;bind PW: &#39; + req.credentials);
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="bindrequest">BindRequest</h2>
 <p>BindRequest objects have the following properties:</p>
 <h3 id="version">version</h3>
@@ -411,7 +418,8 @@ will be the plain-text password.</p>
   console.log(&#39;DN: &#39; + req.dn.toString());
   console.log(&#39;Entry attributes: &#39; + req.toObject().attributes);
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="addrequest">AddRequest</h2>
 <p>AddRequest objects have the following properties:</p>
 <h3 id="entry">entry</h3>
@@ -433,7 +441,8 @@ like:</p>
     sn: [&#39;bar&#39;],
     objectclass: [&#39;person&#39;, &#39;top&#39;]
   }
-}</code></pre>
+}
+</code></pre>
 <h2 id="addresponse">AddResponse</h2>
 <p>No extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="search">Search</h1>
@@ -443,7 +452,8 @@ like:</p>
   console.log(&#39;scope: &#39; + req.scope);
   console.log(&#39;filter: &#39; + req.filter.toString());
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="searchrequest">SearchRequest</h2>
 <p>SearchRequest objects have the following properties:</p>
 <h3 id="baseobject">baseObject</h3>
@@ -492,7 +502,8 @@ JavaScript object that matches the format used from <code>AddRequest.toObject()<
     res.send(obj)
 
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h1 id="modify">modify</h1>
 <p>Allows you to handle an LDAP modify operation.</p>
 <pre><code>server.modify(&#39;o=example&#39;, function(req, res, next) {
@@ -503,7 +514,8 @@ JavaScript object that matches the format used from <code>AddRequest.toObject()<
     console.log(&#39;  modification: &#39; + c.modification.toString());
   });
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="modifyrequest">ModifyRequest</h2>
 <p>ModifyRequest objects have the following properties:</p>
 <h3 id="object">object</h3>
@@ -526,7 +538,8 @@ details on the <code>Change</code> object.</p>
 <pre><code>server.del(&#39;o=example&#39;, function(req, res, next) {
   console.log(&#39;DN: &#39; + req.dn.toString());
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="deleterequest">DeleteRequest</h2>
 <h3 id="entry-1">entry</h3>
 <p>The DN the client is attempting to delete (this is the same as the <code>dn</code>
@@ -540,7 +553,8 @@ property).</p>
   console.log(&#39;attribute name: &#39; + req.attribute);
   console.log(&#39;attribute value: &#39; + req.value);
   res.end(req.value === &#39;foo&#39;);
-});</code></pre>
+});
+</code></pre>
 <h2 id="comparerequest">CompareRequest</h2>
 <h3 id="entry-2">entry</h3>
 <p>The DN the client is attempting to compare (this is the same as the <code>dn</code>
@@ -563,7 +577,8 @@ that, there are no extra methods above an <code>LDAPResult</code> API call.</p>
     (req.newSuperior ? req.newSuperior.toString() : &#39;&#39;));
 
   res.end();
-});</code></pre>
+});
+</code></pre>
 <h2 id="modifydnrequest">ModifyDNRequest</h2>
 <h3 id="entry-3">entry</h3>
 <p>The DN the client is attempting to rename (this is the same as the <code>dn</code>
@@ -590,7 +605,8 @@ server.exop(&#39;1.3.6.1.4.1.4203.1.11.3&#39;, function(req, res, next) {
   res.value = &#39;u:xxyyz@EXAMPLE.NET&#39;;
   res.end();
   return next();
-});</code></pre>
+});
+</code></pre>
 <h2 id="extendedrequest">ExtendedRequest</h2>
 <h3 id="name-1">name</h3>
 <p>Will always be a match to the route-defined name.  Clients must include this
@@ -610,7 +626,8 @@ if you need to clean up any items in your backend, or perform any other cleanup
 tasks you need to.</p>
 <pre><code>server.unbind(function(req, res, next) {
   res.end();
-});</code></pre>
+});
+</code></pre>
 <p>Note that the LDAP unbind operation actually doesn&#39;t send any response (by
 definition in the RFC), so the UnbindResponse is really just a stub that
 ultimately calls <code>net.Socket.end()</code> for you. There are no properties available

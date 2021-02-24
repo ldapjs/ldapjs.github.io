@@ -64,7 +64,8 @@ server.add(&#39;o=example&#39;, function(req, res, next) {
     return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
 
   ...
-});</code></pre>
+});
+</code></pre>
 <p>I.e., if you just pass them into the <code>next()</code> handler, ldapjs will automatically
 return the appropriate LDAP error message, and stop the handler chain.</p>
 <p>All errors will have the following properties:</p>

@@ -103,7 +103,8 @@ ldapjs framework, but if you need it, it&#39;s there.</p>
 <pre><code>var parseDN = require(&#39;ldapjs&#39;).parseDN;
 
 var dn = parseDN(&#39;cn=foo+sn=bar, ou=people, o=example&#39;);
-console.log(dn.toString());</code></pre>
+console.log(dn.toString());
+</code></pre>
 <h1 id="dn">DN</h1>
 <p>The DN object is largely what you&#39;ll be interacting with, since all the server
 APIs are setup to give you a DN object.</p>
@@ -116,7 +117,8 @@ APIs are setup to give you a DN object.</p>
   } else {
     ...
   }
-});</code></pre>
+});
+</code></pre>
 <h2 id="parentofdn">parentOf(dn)</h2>
 <p>The inverse of <code>childOf</code>; returns a boolean on whether or not <code>this</code> is a parent
 of the passed in dn.  Like <code>childOf</code>, can take either a string or a DN.</p>
@@ -127,7 +129,8 @@ of the passed in dn.  Like <code>childOf</code>, can take either a string or a D
   } else {
     ...
   }
-});</code></pre>
+});
+</code></pre>
 <h2 id="equalsdn">equals(dn)</h2>
 <p>Returns a boolean indicating whether <code>this</code> is equivalent to the passed in <code>dn</code>
 argument. <code>dn</code> can be a string or a DN.</p>
@@ -137,7 +140,8 @@ argument. <code>dn</code> can be a string or a DN.</p>
   } else {
     ...
   }
-});</code></pre>
+});
+</code></pre>
 <h2 id="parent">parent()</h2>
 <p>Returns a DN object that is the direct parent of <code>this</code>.  If there is no parent
 this can return <code>null</code> (e.g. <code>parseDN(&#39;o=example&#39;).parent()</code> will return null).</p>
@@ -166,7 +170,8 @@ It accepts the same parameters as <code>format</code>.</p>
 <p>Returns the string representation of <code>this</code>.</p>
 <pre><code>server.add(&#39;o=example&#39;, function(req, res, next) {
   console.log(req.dn.toString());
-});</code></pre>
+});
+</code></pre>
 </div><!-- end #content -->
 
 <script type="text/javascript" charset="utf-8">

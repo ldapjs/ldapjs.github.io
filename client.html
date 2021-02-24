@@ -41,6 +41,11 @@
 </li>
 <li>
 <div>
+<a href="#client-events">Client events</a>
+</div>
+</li>
+<li>
+<div>
 <a href="#common-patterns">Common patterns</a>
 </div>
 </li>
@@ -132,7 +137,12 @@ with LDAP. If you&#39;re not, read the <a href="guide.html">guide</a> first.</p>
 <pre><code>var ldap = require(&#39;ldapjs&#39;);
 var client = ldap.createClient({
   url: [&#39;ldap://127.0.0.1:1389&#39;, &#39;ldap://127.0.0.2:1389&#39;]
-});</code></pre>
+});
+
+client.on(&#39;error&#39;, (err) =&gt; {
+  // handle connection error
+})
+</code></pre>
 <p>You can use <code>ldap://</code> or <code>ldaps://</code>; the latter would connect over SSL (note
 that this will not use the LDAP TLS extended operation, but literally an SSL
 connection to port 636, as in LDAP v2). The full set of options to create a
@@ -207,6 +217,68 @@ more sophisticated control, you can provide an Object with the properties
 <code>initialDelay</code> (default: <code>100</code>), <code>maxDelay</code> (default: <code>10000</code>) and
 <code>failAfter</code> (default: <code>Infinity</code>).
 After the reconnect you maybe need to <a href="#bind">bind</a> again.</p>
+<h2 id="client-events">Client events</h2>
+<p>The client is an <code>EventEmitter</code> and can emit the following events:</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>error</td>
+<td>General error</td>
+</tr>
+<tr>
+<td>connectRefused</td>
+<td>Server refused connection. Most likely bad authentication</td>
+</tr>
+<tr>
+<td>connectTimeout</td>
+<td>Server timeout</td>
+</tr>
+<tr>
+<td>connectError</td>
+<td>Socket connection error</td>
+</tr>
+<tr>
+<td>setupError</td>
+<td>Setup error after successful connection</td>
+</tr>
+<tr>
+<td>socketTimeout</td>
+<td>Socket timeout</td>
+</tr>
+<tr>
+<td>resultError</td>
+<td>Search result error</td>
+</tr>
+<tr>
+<td>timeout</td>
+<td>Search result timeout</td>
+</tr>
+<tr>
+<td>destroy</td>
+<td>After client is disconnected</td>
+</tr>
+<tr>
+<td>end</td>
+<td>Socket end event</td>
+</tr>
+<tr>
+<td>close</td>
+<td>Socket closed</td>
+</tr>
+<tr>
+<td>connect</td>
+<td>Client connected</td>
+</tr>
+<tr>
+<td>idle</td>
+<td>Idle timeout reached</td>
+</tr>
+</tbody></table>
 <h2 id="common-patterns">Common patterns</h2>
 <p>The last two parameters in every API are <code>controls</code> and <code>callback</code>. <code>controls</code>
 can be either a single instance of a <code>Control</code> or an array of <code>Control</code> objects.
@@ -223,7 +295,8 @@ of <code>Control</code> objects. You probably don&#39;t need them though...</p>
 <p>Example:</p>
 <pre><code>client.bind(&#39;cn=root&#39;, &#39;secret&#39;, function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 <h1 id="add">add</h1>
 <p><code>add(dn, entry, controls, callback)</code></p>
 <p>Performs an add operation against the LDAP server.</p>
@@ -238,7 +311,8 @@ controls are optional.</p>
 };
 client.add(&#39;cn=foo, o=example&#39;, entry, function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 <h1 id="compare">compare</h1>
 <p><code>compare(dn, attribute, value, controls, callback)</code></p>
 <p>Performs an LDAP compare operation with the given attribute and value against
@@ -248,14 +322,16 @@ the entry referenced by dn.</p>
   assert.ifError(err);
 
   console.log(&#39;matched: &#39; + matched);
-});</code></pre>
+});
+</code></pre>
 <h1 id="del">del</h1>
 <p><code>del(dn, controls, callback)</code></p>
 <p>Deletes an entry from the LDAP server.</p>
 <p>Example:</p>
 <pre><code>client.del(&#39;cn=foo, o=example&#39;, function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 <h1 id="exop">exop</h1>
 <p><code>exop(name, value, controls, callback)</code></p>
 <p>Performs an LDAP extended operation against an LDAP server. <code>name</code> is typically
@@ -267,7 +343,8 @@ should be.</p>
   assert.ifError(err);
 
   console.log(&#39;whois: &#39; + value);
-});</code></pre>
+});
+</code></pre>
 <h1 id="modify">modify</h1>
 <p><code>modify(name, changes, controls, callback)</code></p>
 <p>Performs an LDAP modify operation against the LDAP server.  This API requires
@@ -283,7 +360,8 @@ pass in a single <code>Change</code> or an array of <code>Change</code> objects.
 
 client.modify(&#39;cn=foo, o=example&#39;, change, function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 <h2 id="change">Change</h2>
 <p>A <code>Change</code> object maps to the LDAP protocol of a modify change, and requires you
 to set the <code>operation</code> and <code>modification</code>.  The <code>operation</code> is a string, and
@@ -323,7 +401,8 @@ as opposed to just renaming the leaf).</li>
 <p>Example:</p>
 <pre><code>client.modifyDN(&#39;cn=foo, o=example&#39;, &#39;cn=bar&#39;, function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 <h1 id="search">search</h1>
 <p><code>search(base, options, controls, callback)</code></p>
 <p>Performs a search operation against the LDAP server.</p>
@@ -402,7 +481,8 @@ client.search(&#39;o=example&#39;, opts, function(err, res) {
   res.on(&#39;end&#39;, function(result) {
     console.log(&#39;status: &#39; + result.status);
   });
-});</code></pre>
+});
+</code></pre>
 <h2 id="filter-strings">Filter Strings</h2>
 <p>The easiest way to write search filters is to write them compliant with RFC2254,
 which is &quot;The string representation of LDAP search filters.&quot;  Note that
@@ -413,12 +493,14 @@ basically are a &quot;tree&quot; of attribute/value assertions, with the tree sp
 in prefix notation.  For example, let&#39;s start simple, and build up a complicated
 filter.  The most basic filter is equality, so let&#39;s assume you want to search
 for an attribute <code>email</code> with a value of <code>foo@bar.com</code>.  The syntax would be:</p>
-<pre><code>(email=foo@bar.com)</code></pre>
+<pre><code>(email=foo@bar.com)
+</code></pre>
 <p>ldapjs requires all filters to be surrounded by &#39;()&#39; blocks. Ok, that was easy.
 Let&#39;s now assume that you want to find all records where the email is actually
 just anything in the &quot;@bar.com&quot; domain and the location attribute is set to
 Seattle:</p>
-<pre><code>(&amp;(email=*@bar.com)(l=Seattle))</code></pre>
+<pre><code>(&amp;(email=*@bar.com)(l=Seattle))
+</code></pre>
 <p>Now our filter is actually three LDAP filters.  We have an <code>and</code> filter (single
 amp <code>&amp;</code>), an <code>equality</code> filter <code>(the l=Seattle)</code>, and a <code>substring</code> filter.
 Substrings are wildcard filters. They use <code>*</code> as the wildcard. You can put more
@@ -426,7 +508,8 @@ than one wildcard for a given string. For example you could do <code>(email=*@*b
 to match any email of @bar.com or its subdomains like <code>&quot;example@foo.bar.com&quot;</code>.</p>
 <p>Now, let&#39;s say we also want to set our filter to include a
 specification that either the employeeType <em>not</em> be a manager nor a secretary:</p>
-<pre><code>(&amp;(email=*@bar.com)(l=Seattle)(!(|(employeeType=manager)(employeeType=secretary))))</code></pre>
+<pre><code>(&amp;(email=*@bar.com)(l=Seattle)(!(|(employeeType=manager)(employeeType=secretary))))
+</code></pre>
 <p>The <code>not</code> character is represented as a <code>!</code>, the <code>or</code> as a single pipe <code>|</code>.
 It gets a little bit complicated, but it&#39;s actually quite powerful, and lets you
 find almost anything you&#39;re looking for.</p>
@@ -458,7 +541,8 @@ client.search(&#39;o=largedir&#39;, opts, function(err, res) {
   res.on(&#39;end&#39;, function(result) {
     console.log(&#39;done &#39;);
   });
-});</code></pre>
+});
+</code></pre>
 <p>This will enable paging with a default page size of 199 (<code>sizeLimit</code> - 1) and
 will output all of the resulting objects via the <code>searchEntry</code> event.  At the
 end of each result during the operation, a <code>page</code> event will be emitted as
@@ -497,7 +581,8 @@ client.search(&#39;o=largerdir&#39;, opts, function(err, res) {
   res.on(&#39;end&#39;, function(result) {
     console.log(&#39;done&#39;);
   });
-});</code></pre>
+});
+</code></pre>
 <h1 id="starttls">starttls</h1>
 <p><code>starttls(options, controls, callback)</code></p>
 <p>Attempt to secure existing LDAP connection via STARTTLS.</p>
@@ -510,7 +595,8 @@ client.starttls(opts, function(err, res) {
   assert.ifError(err);
 
   // Client communication now TLS protected
-});</code></pre>
+});
+</code></pre>
 <h1 id="unbind">unbind</h1>
 <p><code>unbind(callback)</code></p>
 <p>Performs an unbind operation against the LDAP server.</p>
@@ -522,7 +608,8 @@ not have a response.</p>
 <p>Example:</p>
 <pre><code>client.unbind(function(err) {
   assert.ifError(err);
-});</code></pre>
+});
+</code></pre>
 </div><!-- end #content -->
 
 <script type="text/javascript" charset="utf-8">

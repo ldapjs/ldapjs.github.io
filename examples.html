@@ -255,7 +255,8 @@ server.search(SUFFIX, authorize, function(req, res, next) {
 
 server.listen(1389, function() {
   console.log(&#39;LDAP server up at: %s&#39;, server.url);
-});</code></pre>
+});
+</code></pre>
 <h1 id="etcpasswd-server">/etc/passwd server</h1>
 <pre><code>var fs = require(&#39;fs&#39;);
 var ldap = require(&#39;ldapjs&#39;);
@@ -464,7 +465,8 @@ server.search(&#39;o=myhost&#39;, pre, function(req, res, next) {
 // LDAP &quot;standard&quot; listens on 389, but whatever.
 server.listen(1389, &#39;127.0.0.1&#39;, function() {
   console.log(&#39;/etc/passwd LDAP server up at: %s&#39;, server.url);
-});</code></pre>
+});
+</code></pre>
 <h1 id="address-book">Address Book</h1>
 <p>This example is courtesy of <a href="https://github.com/dresende">Diogo Resende</a> and
 illustrates setting up an address book for typical mail clients such as
@@ -572,10 +574,12 @@ db.query(&quot;SELECT c.*,u.username,u.password &quot; +
   server.listen(ldap_port, function() {
     console.log(&quot;Addressbook started at %s&quot;, server.url);
   });
-});</code></pre>
+});
+</code></pre>
 <p>To test out this example, try:</p>
 <pre><code>$ ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
-  -w demo -b &quot;dc=example,dc=com&quot; objectclass=*</code></pre>
+  -w demo -b &quot;dc=example,dc=com&quot; objectclass=*
+</code></pre>
 </div><!-- end #content -->
 
 <script type="text/javascript" charset="utf-8">

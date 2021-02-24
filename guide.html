@@ -118,14 +118,16 @@ Access Protocol&quot;.  A directory service basically breaks down as follows:</p
         /      |         |     \
     cn=john  cn=jane    cn=dudes  cn=dudettes
     /
-keyid=foo</code></pre>
+keyid=foo
+</code></pre>
 <p>Let&#39;s say we wanted to look at the record cn=john:</p>
 <pre><code>dn: cn=john, ou=users, o=example
 cn: john
 sn: smith
 email: john@example.com
 email: john.smith@example.com
-objectClass: person</code></pre>
+objectClass: person
+</code></pre>
 <p>A few things to note:</p>
 <ul>
 <li>All names in a directory tree are actually referred to as a <em>distinguished
@@ -178,7 +180,8 @@ useful to you, then that&#39;s gravy.</p>
 <p>If you don&#39;t already have node.js and npm, clearly you need those, so follow
 the steps at <a href="http://nodejs.org">nodejs.org</a> and <a href="http://npmjs.org">npmjs.org</a>,
 respectively.  After that, run:</p>
-<pre><code>$ npm install ldapjs</code></pre>
+<pre><code>$ npm install ldapjs
+</code></pre>
 <p>Rather than overload you with client-side programming for now, we&#39;ll use
 the OpenLDAP CLI to interact with our server.  It&#39;s almost certainly already
 installed on your system, but if not, you can get it from brew/apt/yum/your
@@ -191,10 +194,12 @@ var server = ldap.createServer();
 
 server.listen(1389, function() {
   console.log(&#39;/etc/passwd LDAP server up at: %s&#39;, server.url);
-});</code></pre>
+});
+</code></pre>
 <p>And run that.  Doing anything will give you errors (LDAP &quot;No Such Object&quot;)
 since we haven&#39;t added any support in yet, but go ahead and try it anyway:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -b &quot;o=myhost&quot; objectclass=*</code></pre>
+<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -b &quot;o=myhost&quot; objectclass=*
+</code></pre>
 <p>Before we go any further, note that the complete code for the server we are
 about to build up is on the <a href="examples.html">examples</a> page.</p>
 <h2 id="bind">Bind</h2>
@@ -216,13 +221,15 @@ this code into your file:</p>
 
   res.end();
   return next();
-});</code></pre>
+});
+</code></pre>
 <p>Not very secure, but this is a demo.  What we did there was &quot;mount&quot; a tree in
 the ldapjs server, and add a handler for the <em>bind</em> method.  If you&#39;ve ever used
 express, this pattern should be really familiar; you can add any number of
 handlers in, as we&#39;ll see later.</p>
 <p>On to the meat of the method.  What&#39;s up with this?</p>
-<pre><code>if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)</code></pre>
+<pre><code>if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
+</code></pre>
 <p>The first part <code>req.dn.toString() !== &#39;cn=root&#39;</code>:  you&#39;re probably thinking
 &quot;WTF?!? Does ldapjs allow something other than cn=root into this handler?&quot; Sort
 of.  It allows cn=root <em>and any children</em> into that handler.  So the entries
@@ -246,12 +253,14 @@ add another handler in later you won&#39;t get bit by it not being invoked.</p>
 
 ldap_bind: Invalid credentials (49)
     matched DN: cn=root
-    additional info: Invalid Credentials</code></pre>
+    additional info: Invalid Credentials
+</code></pre>
 <p>And again with the correct one:</p>
 <pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; objectclass=*
 
 No such object (32)
-Additional information: No tree found for: o=myhost</code></pre>
+Additional information: No tree found for: o=myhost
+</code></pre>
 <p>Don&#39;t worry about all the flags we&#39;re passing into OpenLDAP, that&#39;s just to make
 their CLI less annonyingly noisy.  This time, we got another <code>No such object</code>
 error, but it&#39;s for the tree <code>o=myhost</code>. That means our bind went through, and
@@ -267,14 +276,16 @@ authorization handler that we&#39;ll use in all our subsequent routes:</p>
     return next(new ldap.InsufficientAccessRightsError());
 
   return next();
-}</code></pre>
+}
+</code></pre>
 <p>Should be pretty self-explanatory, but as a reminder, LDAP is connection
 oriented, so we check that the connection remote user was indeed our <code>cn=root</code>
 (by default ldapjs will have a DN of <code>cn=anonymous</code> if the client didn&#39;t bind).</p>
 <h2 id="search">Search</h2>
 <p>We said we wanted to allow LDAP operations over /etc/passwd, so let&#39;s detour
 for a moment to explain an /etc/passwd record.</p>
-<pre><code>jsmith:x:1001:1000:Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email:/home/jsmith:/bin/sh</code></pre>
+<pre><code>jsmith:x:1001:1000:Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email:/home/jsmith:/bin/sh
+</code></pre>
 <p>The sample record above maps to:</p>
 <table>
 <thead>
@@ -348,7 +359,8 @@ source file).</p>
 
     return next();
   });
-}</code></pre>
+}
+</code></pre>
 <p>Ok, all that did is tack the /etc/passwd records onto req.users so that any
 subsequent handler doesn&#39;t have to reload the file.  Next, let&#39;s write a search
 handler to process that:</p>
@@ -362,7 +374,8 @@ server.search(&#39;o=myhost&#39;, pre, function(req, res, next) {
 
   res.end();
   return next();
-});</code></pre>
+});
+</code></pre>
 <p>And try running:</p>
 <pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; cn=root
 dn: cn=root, ou=users, o=myhost
@@ -372,15 +385,18 @@ gid: 0
 description: System Administrator
 homedirectory: /var/root
 shell: /bin/sh
-objectclass: unixUser</code></pre>
+objectclass: unixUser
+</code></pre>
 <p>Sweet! Try this out too:</p>
 <pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; objectclass=*
-...</code></pre>
+...
+</code></pre>
 <p>You should have seen an entry for every record in /etc/passwd with the second.
 What all did we do here?  A lot.  Let&#39;s break this down...</p>
 <h3 id="what-did-i-just-do-on-the-command-line">What did I just do on the command line?</h3>
 <p>Let&#39;s start with looking at what you even asked for:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; cn=root</code></pre>
+<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; cn=root
+</code></pre>
 <p>We can throw away <code>ldapsearch -H -x -D -w -LLL</code>, as those just specify the URL
 to connect to, the bind credentials and the <code>-LLL</code> just quiets down OpenLDAP.
 That leaves us with: <code>-b &quot;o=myhost&quot; cn=root</code>.</p>
@@ -417,7 +433,8 @@ of attributes.  So that&#39;s why we did this:</p>
     shell: record[6] || &#39;&#39;,
     objectclass: &#39;unixUser&#39;
   }
-};</code></pre>
+};
+</code></pre>
 <p>Next, we let ldapjs do all the hard work of figuring out LDAP search filters
 for us by calling <code>req.filter.matches</code>.  If it matched, we return the whole
 record with <code>res.send</code>.  In this little example we&#39;re running O(n), so for
@@ -436,7 +453,8 @@ gid: 13
 
 dn: cn=pulse, ou=users, o=myhost
 cn: pulse
-gid: 114</code></pre>
+gid: 114
+</code></pre>
 <h2 id="add">Add</h2>
 <p>This is going to be a little bit ghetto, since what we&#39;re going to do is just
 use node&#39;s child process module to spawn calls to <code>adduser</code>.  Go ahead and add
@@ -498,7 +516,8 @@ the following code in as another handler (you&#39;ll need a
     res.end();
     return next();
   });
-});</code></pre>
+});
+</code></pre>
 <p>Then, you&#39;ll need to be root to have this running, so start your server with
 <code>sudo</code> (or be root, whatever).  Now, go ahead and create a file called
 <code>user.ldif</code> with the following contents:</p>
@@ -506,10 +525,12 @@ the following code in as another handler (you&#39;ll need a
 objectClass: unixUser
 cn: ldapjs
 shell: /bin/bash
-description: Created via ldapadd</code></pre>
+description: Created via ldapadd
+</code></pre>
 <p>Now go ahead and invoke with:</p>
 <pre><code>$ ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif
-adding new entry &quot;cn=ldapjs, ou=users, o=myhost&quot;</code></pre>
+adding new entry &quot;cn=ldapjs, ou=users, o=myhost&quot;
+</code></pre>
 <p>Let&#39;s confirm he got added with an ldapsearch:</p>
 <pre><code>$ ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b &quot;ou=users, o=myhost&quot; cn=ldapjs
 dn: cn=ldapjs, ou=users, o=myhost
@@ -519,7 +540,8 @@ gid: 1001
 description: Created via ldapadd
 homedirectory: /home/ldapjs
 shell: /bin/bash
-objectclass: unixUser</code></pre>
+objectclass: unixUser
+</code></pre>
 <p>As before, here&#39;s a breakdown of the code:</p>
 <pre><code>server.add(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
   if (!req.dn.rdns[0].attrs.cn)
@@ -531,7 +553,8 @@ objectclass: unixUser</code></pre>
   var entry = req.toObject().attributes;
 
   if (entry.objectclass.indexOf(&#39;unixUser&#39;) === -1)
-    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));</code></pre>
+    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));
+</code></pre>
 <p>A few new things:</p>
 <ul>
 <li>We mounted this handler at <code>ou=users, o=myhost</code>. Why? What if we want to
@@ -597,7 +620,8 @@ Go ahead and add the following code into your source file:</p>
     res.end();
     return next();
   });
-});</code></pre>
+});
+</code></pre>
 <p>Basically, we made sure the remote client was targeting an entry that exists,
 ensuring that they were asking to &quot;replace&quot; the <code>userPassword</code> attribute (which
 is the &#39;standard&#39; LDAP attribute for passwords; if you think it&#39;s easier to use
@@ -608,9 +632,11 @@ and create a <code>passwd.ldif</code> file:</p>
 changetype: modify
 replace: userPassword
 userPassword: secret
--</code></pre>
+-
+</code></pre>
 <p>And then run the OpenLDAP CLI:</p>
-<pre><code>$ ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</code></pre>
+<pre><code>$ ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif
+</code></pre>
 <p>You should now be able to login to your box as the ldapjs user. Let&#39;s get
 the last &quot;mainline&quot; piece of work out of the way, and delete the user.</p>
 <h2 id="delete">Delete</h2>
@@ -641,9 +667,11 @@ delete it :).  Add the following code into your server:</p>
     res.end();
     return next();
   });
-});</code></pre>
+});
+</code></pre>
 <p>And then run the following command:</p>
-<pre><code>$ ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret &quot;cn=ldapjs, ou=users, o=myhost&quot;</code></pre>
+<pre><code>$ ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret &quot;cn=ldapjs, ou=users, o=myhost&quot;
+</code></pre>
 <h1 id="where-to-go-from-here">Where to go from here</h1>
 <p>The complete source code for this example server is available in
 <a href="examples.html">examples</a>.  Make sure to read up on the <a href="server.html">server</a>
