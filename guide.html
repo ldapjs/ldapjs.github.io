@@ -4,7 +4,7 @@
     <title>LDAP Guide | ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="media/css/style.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="media/css/highlight.css">
 </head>
 <body>
 <div id="header">
@@ -116,12 +116,12 @@ Access Protocol&quot;.  A directory service basically breaks down as follows:</p
               /       \
          ou=users     ou=groups
         /      |         |     \
-    cn=john  cn=jane    cn=dudes  cn=dudettes
+    cn=john  cn=jane  cn=dudes  cn=dudettes
     /
 keyid=foo
 </code></pre>
 <p>Let&#39;s say we wanted to look at the record cn=john:</p>
-<pre><code>dn: cn=john, ou=users, o=example
+<pre><code class="language-shell">dn: cn=john, ou=users, o=example
 cn: john
 sn: smith
 email: john@example.com
@@ -180,7 +180,7 @@ useful to you, then that&#39;s gravy.</p>
 <p>If you don&#39;t already have node.js and npm, clearly you need those, so follow
 the steps at <a href="http://nodejs.org">nodejs.org</a> and <a href="http://npmjs.org">npmjs.org</a>,
 respectively.  After that, run:</p>
-<pre><code>$ npm install ldapjs
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> npm install ldapjs</span>
 </code></pre>
 <p>Rather than overload you with client-side programming for now, we&#39;ll use
 the OpenLDAP CLI to interact with our server.  It&#39;s almost certainly already
@@ -188,17 +188,17 @@ installed on your system, but if not, you can get it from brew/apt/yum/your
 package manager here.</p>
 <p>To get started, open some file, and let&#39;s get the library loaded and a server
 created:</p>
-<pre><code>var ldap = require(&#39;ldapjs&#39;);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 
-var server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.createServer();
 
-server.listen(1389, function() {
-  console.log(&#39;/etc/passwd LDAP server up at: %s&#39;, server.url);
+server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.url);
 });
 </code></pre>
 <p>And run that.  Doing anything will give you errors (LDAP &quot;No Such Object&quot;)
 since we haven&#39;t added any support in yet, but go ahead and try it anyway:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -b &quot;o=myhost&quot; objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 </code></pre>
 <p>Before we go any further, note that the complete code for the server we are
 about to build up is on the <a href="examples.html">examples</a> page.</p>
@@ -215,12 +215,12 @@ and get it out of our way.</p>
 has no correspondence to our Unix root user, it&#39;s just something we&#39;re making up
 and going to use for allowing an (LDAP) admin to do anything.  To do so, add
 this code into your file:</p>
-<pre><code>server.bind(&#39;cn=root&#39;, function(req, res, next) {
-  if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
-    return next(new ldap.InvalidCredentialsError());
+<pre><code class="language-js">server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 </code></pre>
 <p>Not very secure, but this is a demo.  What we did there was &quot;mount&quot; a tree in
@@ -228,7 +228,7 @@ the ldapjs server, and add a handler for the <em>bind</em> method.  If you&#39;v
 express, this pattern should be really familiar; you can add any number of
 handlers in, as we&#39;ll see later.</p>
 <p>On to the meat of the method.  What&#39;s up with this?</p>
-<pre><code>if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
+<pre><code class="language-js"><span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
 </code></pre>
 <p>The first part <code>req.dn.toString() !== &#39;cn=root&#39;</code>:  you&#39;re probably thinking
 &quot;WTF?!? Does ldapjs allow something other than cn=root into this handler?&quot; Sort
@@ -249,14 +249,14 @@ send the proper error code back to the client.</p>
 have one handler in the chain, but it&#39;s good habit to always do that, so if you
 add another handler in later you won&#39;t get bit by it not being invoked.</p>
 <p>Blah blah, let&#39;s try running the ldap client again, first with a bad password:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b &quot;o=myhost&quot; objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 ldap_bind: Invalid credentials (49)
     matched DN: cn=root
     additional info: Invalid Credentials
 </code></pre>
 <p>And again with the correct one:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 No such object (32)
 Additional information: No tree found for: o=myhost
@@ -271,11 +271,11 @@ we added a bind route, so the only user that can authenticate is <code>cn=root</
 what if the remote end doesn&#39;t authenticate at all? Right, nothing says they
 <em>have to</em> bind, that&#39;s just what the common clients do.  Let&#39;s add a quick
 authorization handler that we&#39;ll use in all our subsequent routes:</p>
-<pre><code>function authorize(req, res, next) {
-  if (!req.connection.ldap.bindDN.equals(&#39;cn=root&#39;))
-    return next(new ldap.InsufficientAccessRightsError());
+<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
+  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
 
-  return next();
+  <span class="hljs-keyword">return</span> next();
 }
 </code></pre>
 <p>Should be pretty self-explanatory, but as a reminder, LDAP is connection
@@ -284,7 +284,7 @@ oriented, so we check that the connection remote user was indeed our <code>cn=ro
 <h2 id="search">Search</h2>
 <p>We said we wanted to allow LDAP operations over /etc/passwd, so let&#39;s detour
 for a moment to explain an /etc/passwd record.</p>
-<pre><code>jsmith:x:1001:1000:Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email:/home/jsmith:/bin/sh
+<pre><code class="language-shell">jsmith:x:1001:1000:Joe Smith,Room 1007,(234)555-8910,(234)555-0044,email:/home/jsmith:/bin/sh
 </code></pre>
 <p>The sample record above maps to:</p>
 <table>
@@ -324,60 +324,61 @@ for a moment to explain an /etc/passwd record.</p>
 </tr>
 </tbody></table>
 <p>Let&#39;s write some handlers to parse that and transform it into an LDAP search
-record (note, you&#39;ll need to add <code>var fs = require(&#39;fs&#39;);</code> at the top of the
+record (note, you&#39;ll need to add <code>const fs = require(&#39;fs&#39;);</code> at the top of the
 source file).</p>
 <p>First, make a handler that just loads the &quot;user database&quot; in a &quot;pre&quot; handler:</p>
-<pre><code>function loadPasswdFile(req, res, next) {
-  fs.readFile(&#39;/etc/passwd&#39;, &#39;utf8&#39;, function(err, data) {
-    if (err)
-      return next(new ldap.OperationsError(err.message));
+<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) </span>{
+  fs.readFile(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (err)
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(err.message));
 
     req.users = {};
 
-    var lines = data.split(&#39;\n&#39;);
-    for (var i = 0; i &lt; lines.length; i++) {
-      if (!lines[i] || /^#/.test(lines[i]))
-        continue;
+    <span class="hljs-keyword">const</span> lines = data.split(<span class="hljs-string">&#x27;\n&#x27;</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> lines) {
+      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.test(line))
+        <span class="hljs-keyword">continue</span>;
 
-      var record = lines[i].split(&#39;:&#39;);
-      if (!record || !record.length)
-        continue;
+      <span class="hljs-keyword">const</span> record = line.split(<span class="hljs-string">&#x27;:&#x27;</span>);
+      <span class="hljs-keyword">if</span> (!record || !record.length)
+        <span class="hljs-keyword">continue</span>;
 
-      req.users[record[0]] = {
-        dn: &#39;cn=&#39; + record[0] + &#39;, ou=users, o=myhost&#39;,
-        attributes: {
-          cn: record[0],
-          uid: record[2],
-          gid: record[3],
-          description: record[4],
-          homedirectory: record[5],
-          shell: record[6] || &#39;&#39;,
-          objectclass: &#39;unixUser&#39;
+      req.users[record[<span class="hljs-number">0</span>]] = {
+        <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;cn=&#x27;</span> + record[<span class="hljs-number">0</span>] + <span class="hljs-string">&#x27;, ou=users, o=myhost&#x27;</span>,
+        <span class="hljs-attr">attributes</span>: {
+          <span class="hljs-attr">cn</span>: record[<span class="hljs-number">0</span>],
+          <span class="hljs-attr">uid</span>: record[<span class="hljs-number">2</span>],
+          <span class="hljs-attr">gid</span>: record[<span class="hljs-number">3</span>],
+          <span class="hljs-attr">description</span>: record[<span class="hljs-number">4</span>],
+          <span class="hljs-attr">homedirectory</span>: record[<span class="hljs-number">5</span>],
+          <span class="hljs-attr">shell</span>: record[<span class="hljs-number">6</span>] || <span class="hljs-string">&#x27;&#x27;</span>,
+          <span class="hljs-attr">objectclass</span>: <span class="hljs-string">&#x27;unixUser&#x27;</span>
         }
       };
     }
 
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 }
 </code></pre>
 <p>Ok, all that did is tack the /etc/passwd records onto req.users so that any
 subsequent handler doesn&#39;t have to reload the file.  Next, let&#39;s write a search
 handler to process that:</p>
-<pre><code>var pre = [authorize, loadPasswdFile];
+<pre><code class="language-js"><span class="hljs-keyword">const</span> pre = [authorize, loadPasswdFile];
 
-server.search(&#39;o=myhost&#39;, pre, function(req, res, next) {
-  Object.keys(req.users).forEach(function(k) {
-    if (req.filter.matches(req.users[k].attributes))
+server.search(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(req.users);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> k <span class="hljs-keyword">of</span> keys) {
+    <span class="hljs-keyword">if</span> (req.filter.matches(req.users[k].attributes))
       res.send(req.users[k]);
-  });
+  }
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 </code></pre>
 <p>And try running:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; cn=root
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 dn: cn=root, ou=users, o=myhost
 cn: root
 uid: 0
@@ -388,14 +389,14 @@ shell: /bin/sh
 objectclass: unixUser
 </code></pre>
 <p>Sweet! Try this out too:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 ...
 </code></pre>
 <p>You should have seen an entry for every record in /etc/passwd with the second.
 What all did we do here?  A lot.  Let&#39;s break this down...</p>
 <h3 id="what-did-i-just-do-on-the-command-line">What did I just do on the command line?</h3>
 <p>Let&#39;s start with looking at what you even asked for:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; cn=root
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 </code></pre>
 <p>We can throw away <code>ldapsearch -H -x -D -w -LLL</code>, as those just specify the URL
 to connect to, the bind credentials and the <code>-LLL</code> just quiets down OpenLDAP.
@@ -422,16 +423,16 @@ did was read in /etc/passwd line by line.  After that, we looked at each record
 and made the cheesiest transform ever, which is making up a &quot;search entry.&quot; A
 search entry <em>must</em> have a DN so the client knows what record it is, and a set
 of attributes.  So that&#39;s why we did this:</p>
-<pre><code>var entry = {
-  dn: &#39;cn=&#39; + record[0] + &#39;, ou=users, o=myhost&#39;,
-  attributes: {
-    cn: record[0],
-    uid: record[2],
-    gid: record[3],
-    description: record[4],
-    homedirectory: record[5],
-    shell: record[6] || &#39;&#39;,
-    objectclass: &#39;unixUser&#39;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> entry = {
+  <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;cn=&#x27;</span> + record[<span class="hljs-number">0</span>] + <span class="hljs-string">&#x27;, ou=users, o=myhost&#x27;</span>,
+  <span class="hljs-attr">attributes</span>: {
+    <span class="hljs-attr">cn</span>: record[<span class="hljs-number">0</span>],
+    <span class="hljs-attr">uid</span>: record[<span class="hljs-number">2</span>],
+    <span class="hljs-attr">gid</span>: record[<span class="hljs-number">3</span>],
+    <span class="hljs-attr">description</span>: record[<span class="hljs-number">4</span>],
+    <span class="hljs-attr">homedirectory</span>: record[<span class="hljs-number">5</span>],
+    <span class="hljs-attr">shell</span>: record[<span class="hljs-number">6</span>] || <span class="hljs-string">&#x27;&#x27;</span>,
+    <span class="hljs-attr">objectclass</span>: <span class="hljs-string">&#x27;unixUser&#x27;</span>
   }
 };
 </code></pre>
@@ -446,7 +447,7 @@ LDAP server over riak.</p>
 shell set to <code>/bin/false</code> and whose name starts with <code>p</code> (I&#39;m doing this
 on Ubuntu).  Then, let&#39;s say we only care about their login name and primary
 group id.  We&#39;d do this:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b &quot;o=myhost&quot; &quot;(&amp;(shell=/bin/false)(cn=p*))&quot; cn gid
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> <span class="hljs-string">&quot;(&amp;(shell=/bin/false)(cn=p*))&quot;</span> cn gid</span>
 dn: cn=proxy, ou=users, o=myhost
 cn: proxy
 gid: 13
@@ -459,80 +460,80 @@ gid: 114
 <p>This is going to be a little bit ghetto, since what we&#39;re going to do is just
 use node&#39;s child process module to spawn calls to <code>adduser</code>.  Go ahead and add
 the following code in as another handler (you&#39;ll need a
-<code>var spawn = require(&#39;child_process&#39;).spawn;</code> at the top of your file):</p>
-<pre><code>server.add(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].attrs.cn)
-    return next(new ldap.ConstraintViolationError(&#39;cn required&#39;));
+<code>const { spawn } = require(&#39;child_process&#39;);</code> at the top of your file):</p>
+<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  if (req.users[req.dn.rdns[0].attrs.cn.value])
-    return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
 
-  var entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
 
-  if (entry.objectclass.indexOf(&#39;unixUser&#39;) === -1)
-    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));
+  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
 
-  var opts = [&#39;-m&#39;];
-  if (entry.description) {
-    opts.push(&#39;-c&#39;);
-    opts.push(entry.description[0]);
+  <span class="hljs-keyword">const</span> opts = [<span class="hljs-string">&#x27;-m&#x27;</span>];
+  <span class="hljs-keyword">if</span> (entry.description) {
+    opts.push(<span class="hljs-string">&#x27;-c&#x27;</span>);
+    opts.push(entry.description[<span class="hljs-number">0</span>]);
   }
-  if (entry.homedirectory) {
-    opts.push(&#39;-d&#39;);
-    opts.push(entry.homedirectory[0]);
+  <span class="hljs-keyword">if</span> (entry.homedirectory) {
+    opts.push(<span class="hljs-string">&#x27;-d&#x27;</span>);
+    opts.push(entry.homedirectory[<span class="hljs-number">0</span>]);
   }
-  if (entry.gid) {
-    opts.push(&#39;-g&#39;);
-    opts.push(entry.gid[0]);
+  <span class="hljs-keyword">if</span> (entry.gid) {
+    opts.push(<span class="hljs-string">&#x27;-g&#x27;</span>);
+    opts.push(entry.gid[<span class="hljs-number">0</span>]);
   }
-  if (entry.shell) {
-    opts.push(&#39;-s&#39;);
-    opts.push(entry.shell[0]);
+  <span class="hljs-keyword">if</span> (entry.shell) {
+    opts.push(<span class="hljs-string">&#x27;-s&#x27;</span>);
+    opts.push(entry.shell[<span class="hljs-number">0</span>]);
   }
-  if (entry.uid) {
-    opts.push(&#39;-u&#39;);
-    opts.push(entry.uid[0]);
+  <span class="hljs-keyword">if</span> (entry.uid) {
+    opts.push(<span class="hljs-string">&#x27;-u&#x27;</span>);
+    opts.push(entry.uid[<span class="hljs-number">0</span>]);
   }
-  opts.push(entry.cn[0]);
-  var useradd = spawn(&#39;useradd&#39;, opts);
+  opts.push(entry.cn[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">const</span> useradd = spawn(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
 
-  var messages = [];
+  <span class="hljs-keyword">const</span> messages = [];
 
-  useradd.stdout.on(&#39;data&#39;, function(data) {
+  useradd.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
-  useradd.stderr.on(&#39;data&#39;, function(data) {
+  useradd.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
 
-  useradd.on(&#39;exit&#39;, function(code) {
-    if (code !== 0) {
-      var msg = &#39;&#39; + code;
-      if (messages.length)
-        msg += &#39;: &#39; + messages.join();
-      return next(new ldap.OperationsError(msg));
+  useradd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
+      <span class="hljs-keyword">if</span> (messages.length)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 </code></pre>
 <p>Then, you&#39;ll need to be root to have this running, so start your server with
 <code>sudo</code> (or be root, whatever).  Now, go ahead and create a file called
 <code>user.ldif</code> with the following contents:</p>
-<pre><code>dn: cn=ldapjs, ou=users, o=myhost
+<pre><code class="language-shell">dn: cn=ldapjs, ou=users, o=myhost
 objectClass: unixUser
 cn: ldapjs
 shell: /bin/bash
 description: Created via ldapadd
 </code></pre>
 <p>Now go ahead and invoke with:</p>
-<pre><code>$ ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif</span>
 adding new entry &quot;cn=ldapjs, ou=users, o=myhost&quot;
 </code></pre>
 <p>Let&#39;s confirm he got added with an ldapsearch:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b &quot;ou=users, o=myhost&quot; cn=ldapjs
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b <span class="hljs-string">&quot;ou=users, o=myhost&quot;</span> cn=ldapjs</span>
 dn: cn=ldapjs, ou=users, o=myhost
 cn: ldapjs
 uid: 1001
@@ -543,17 +544,18 @@ shell: /bin/bash
 objectclass: unixUser
 </code></pre>
 <p>As before, here&#39;s a breakdown of the code:</p>
-<pre><code>server.add(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].attrs.cn)
-    return next(new ldap.ConstraintViolationError(&#39;cn required&#39;));
+<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  if (req.users[req.dn.rdns[0].attrs.cn.value])
-    return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
 
-  var entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
 
-  if (entry.objectclass.indexOf(&#39;unixUser&#39;) === -1)
-    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));
+  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
+});
 </code></pre>
 <p>A few new things:</p>
 <ul>
@@ -586,39 +588,39 @@ support that via the <em>modify</em> command.</p>
 <p>Unlike HTTP, &quot;partial&quot; document updates are fully specified as part of the
 RFC, so appending, removing, or replacing a single attribute is pretty natural.
 Go ahead and add the following code into your source file:</p>
-<pre><code>server.modify(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].attrs.cn || !req.users[req.dn.rdns[0].attrs.cn.value])
-    return next(new ldap.NoSuchObjectError(req.dn.toString()));
+<pre><code class="language-js">server.modify(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
 
-  if (!req.changes.length)
-    return next(new ldap.ProtocolError(&#39;changes required&#39;));
+  <span class="hljs-keyword">if</span> (!req.changes.length)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
 
-  var user = req.users[req.dn.rdns[0].attrs.cn.value].attributes;
-  var mod;
+  <span class="hljs-keyword">const</span> user = req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value].attributes;
+  <span class="hljs-keyword">let</span> mod;
 
-  for (var i = 0; i &lt; req.changes.length; i++) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">0</span>; i &lt; req.changes.length; i++) {
     mod = req.changes[i].modification;
-    switch (req.changes[i].operation) {
-    case &#39;replace&#39;:
-      if (mod.type !== &#39;userpassword&#39; || !mod.vals || !mod.vals.length)
-        return next(new ldap.UnwillingToPerformError(&#39;only password updates &#39; +
-                                                     &#39;allowed&#39;));
-      break;
-    case &#39;add&#39;:
-    case &#39;delete&#39;:
-      return next(new ldap.UnwillingToPerformError(&#39;only replace allowed&#39;));
+    <span class="hljs-keyword">switch</span> (req.changes[i].operation) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
+      <span class="hljs-keyword">if</span> (mod.type !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.vals || !mod.vals.length)
+        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
+                                                     <span class="hljs-string">&#x27;allowed&#x27;</span>));
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
     }
   }
 
-  var passwd = spawn(&#39;chpasswd&#39;, [&#39;-c&#39;, &#39;MD5&#39;]);
-  passwd.stdin.end(user.cn + &#39;:&#39; + mod.vals[0], &#39;utf8&#39;);
+  <span class="hljs-keyword">const</span> passwd = spawn(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
+  passwd.stdin.end(user.cn + <span class="hljs-string">&#x27;:&#x27;</span> + mod.vals[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
 
-  passwd.on(&#39;exit&#39;, function(code) {
-    if (code !== 0)
-      return next(new ldap.OperationsError(code));
+  passwd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(code));
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 </code></pre>
@@ -628,49 +630,49 @@ is the &#39;standard&#39; LDAP attribute for passwords; if you think it&#39;s ea
 &#39;password&#39;, knock yourself out), and then just delegating to the <code>chpasswd</code>
 command (which lets you change a user&#39;s password over stdin).  Next, go ahead
 and create a <code>passwd.ldif</code> file:</p>
-<pre><code>dn: cn=ldapjs, ou=users, o=myhost
+<pre><code class="language-shell">dn: cn=ldapjs, ou=users, o=myhost
 changetype: modify
 replace: userPassword
 userPassword: secret
 -
 </code></pre>
 <p>And then run the OpenLDAP CLI:</p>
-<pre><code>$ ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</span>
 </code></pre>
 <p>You should now be able to login to your box as the ldapjs user. Let&#39;s get
 the last &quot;mainline&quot; piece of work out of the way, and delete the user.</p>
 <h2 id="delete">Delete</h2>
 <p>Delete is pretty straightforward. The client gives you a dn to delete, and you
 delete it :).  Add the following code into your server:</p>
-<pre><code>server.del(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].attrs.cn || !req.users[req.dn.rdns[0].attrs.cn.value])
-    return next(new ldap.NoSuchObjectError(req.dn.toString()));
+<pre><code class="language-js">server.del(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
 
-  var userdel = spawn(&#39;userdel&#39;, [&#39;-f&#39;, req.dn.rdns[0].attrs.cn.value]);
+  <span class="hljs-keyword">const</span> userdel = spawn(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value]);
 
-  var messages = [];
-  userdel.stdout.on(&#39;data&#39;, function(data) {
+  <span class="hljs-keyword">const</span> messages = [];
+  userdel.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
-  userdel.stderr.on(&#39;data&#39;, function(data) {
+  userdel.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
 
-  userdel.on(&#39;exit&#39;, function(code) {
-    if (code !== 0) {
-      var msg = &#39;&#39; + code;
-      if (messages.length)
-        msg += &#39;: &#39; + messages.join();
-      return next(new ldap.OperationsError(msg));
+  userdel.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
+      <span class="hljs-keyword">if</span> (messages.length)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 </code></pre>
 <p>And then run the following command:</p>
-<pre><code>$ ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret &quot;cn=ldapjs, ou=users, o=myhost&quot;
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret <span class="hljs-string">&quot;cn=ldapjs, ou=users, o=myhost&quot;</span></span>
 </code></pre>
 <h1 id="where-to-go-from-here">Where to go from here</h1>
 <p>The complete source code for this example server is available in
@@ -684,52 +686,8 @@ the <a href="http://tools.ietf.org/html/rfc4510">RFCs</a> as you work through th
 ldapjs.</p>
 </div><!-- end #content -->
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-    var headerHeight = $("#header").height();
-    var offsets = [];
-    var current = -1;
-
-    function endpoint(scrollDistance) {
-        if (scrollDistance < offsets[0]) {
-            return -1;
-        } else {
-            for (var id = offsets.length; id > 0; id--) {
-                if (scrollDistance > offsets[id - 1]) {
-                    return id - 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    $("h2").each(function(i) {
-        offsets.push($(this).offset().top - headerHeight)
-    });
-
-    $("#content").append('<h2 class="fixed" style="display: none"><span>&nbsp;</span></h2>');
-    var fixed_h2 = $("h2.fixed");
-    var fixed_span = $("h2.fixed span");
-
-    $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
-        var now = endpoint(scrollDistance);
-
-        if (now !== current) {
-            $("#sidebar li").removeClass("current");
-            current = now;
-            if (current < 0) {
-                fixed_h2.hide();
-            } else if (current >= 0) {
-                var heading = $($("h2 span")[current]).text();
-                $("#sidebar a[href|=#" + heading.replace(' ', '-') + "]").parent().addClass("current");
-                fixed_span.text(heading);
-                fixed_h2.show();
-            }
-        }
-    });
-});
-</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
 
 </body>
 </html>

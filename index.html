@@ -4,7 +4,7 @@
     <title>ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="media/css/style.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="media/css/highlight.css">
 </head>
 <body>
 <div id="header">
@@ -67,31 +67,31 @@ Reimagining <a href="http://tools.ietf.org/html/rfc4510" id="indextaglink">LDAP<
 with HTTP services in node and <a href="http://restify.com">restify</a>.</p>
 </div>
 
-<pre><code>var ldap = require(&#39;ldapjs&#39;);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 
-var server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.createServer();
 
-server.search(&#39;o=example&#39;, function(req, res, next) {
-  var obj = {
-    dn: req.dn.toString(),
-    attributes: {
-      objectclass: [&#39;organization&#39;, &#39;top&#39;],
-      o: &#39;example&#39;
+server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> obj = {
+    <span class="hljs-attr">dn</span>: req.dn.toString(),
+    <span class="hljs-attr">attributes</span>: {
+      <span class="hljs-attr">objectclass</span>: [<span class="hljs-string">&#x27;organization&#x27;</span>, <span class="hljs-string">&#x27;top&#x27;</span>],
+      <span class="hljs-attr">o</span>: <span class="hljs-string">&#x27;example&#x27;</span>
     }
   };
 
-  if (req.filter.matches(obj.attributes))
+  <span class="hljs-keyword">if</span> (req.filter.matches(obj.attributes))
     res.send(obj);
 
   res.end();
 });
 
-server.listen(1389, function() {
-  console.log(&#39;LDAP server listening at %s&#39;, server.url);
+server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;LDAP server listening at %s&#x27;</span>, server.url);
 });
 </code></pre>
 <p>Try hitting that with:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*</span>
 </code></pre>
 <h1 id="features">Features</h1>
 <p>ldapjs implements most of the common operations in the LDAP v3 RFC(s), for
@@ -101,7 +101,7 @@ LDAPv3-compliant implementation.  ldapjs gives you a powerful routing and
 &quot;intercepting filter&quot; pattern for implementing server(s).  It is intended
 that you can build LDAP over anything you want, not just traditional databases.</p>
 <h1 id="getting-started">Getting started</h1>
-<pre><code>$ npm install ldapjs
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> npm install ldapjs</span>
 </code></pre>
 <p>If you&#39;re new to LDAP, check out the <a href="guide.html">guide</a>.  Otherwise, the
 API documentation is:</p>
@@ -157,52 +157,8 @@ Specifically:</p>
 <p>There are a few others, but those are the &quot;big&quot; ones.</p>
 </div><!-- end #content -->
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-    var headerHeight = $("#header").height();
-    var offsets = [];
-    var current = -1;
-
-    function endpoint(scrollDistance) {
-        if (scrollDistance < offsets[0]) {
-            return -1;
-        } else {
-            for (var id = offsets.length; id > 0; id--) {
-                if (scrollDistance > offsets[id - 1]) {
-                    return id - 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    $("h2").each(function(i) {
-        offsets.push($(this).offset().top - headerHeight)
-    });
-
-    $("#content").append('<h2 class="fixed" style="display: none"><span>&nbsp;</span></h2>');
-    var fixed_h2 = $("h2.fixed");
-    var fixed_span = $("h2.fixed span");
-
-    $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
-        var now = endpoint(scrollDistance);
-
-        if (now !== current) {
-            $("#sidebar li").removeClass("current");
-            current = now;
-            if (current < 0) {
-                fixed_h2.hide();
-            } else if (current >= 0) {
-                var heading = $($("h2 span")[current]).text();
-                $("#sidebar a[href|=#" + heading.replace(' ', '-') + "]").parent().addClass("current");
-                fixed_span.text(heading);
-                fixed_h2.show();
-            }
-        }
-    });
-});
-</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
 
 </body>
 </html>

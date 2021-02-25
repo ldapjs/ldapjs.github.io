@@ -4,7 +4,7 @@
     <title>Examples | ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="media/css/style.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="media/css/highlight.css">
 </head>
 <body>
 <div id="header">
@@ -57,577 +57,536 @@ with ldapjs.</p>
 </div>
 
 <h1 id="in-memory-server">In-memory server</h1>
-<pre><code>var ldap = require(&#39;ldapjs&#39;);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 
 
-///--- Shared handlers
+<span class="hljs-comment">///--- Shared handlers</span>
 
-function authorize(req, res, next) {
-  /* Any user may search after bind, only cn=root has full power */
-  var isSearch = (req instanceof ldap.SearchRequest);
-  if (!req.connection.ldap.bindDN.equals(&#39;cn=root&#39;) &amp;&amp; !isSearch)
-    return next(new ldap.InsufficientAccessRightsError());
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
+  <span class="hljs-comment">/* Any user may search after bind, only cn=root has full power */</span>
+  <span class="hljs-keyword">const</span> isSearch = (req <span class="hljs-keyword">instanceof</span> ldap.SearchRequest);
+  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>) &amp;&amp; !isSearch)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
 
-  return next();
+  <span class="hljs-keyword">return</span> next();
 }
 
 
-///--- Globals
+<span class="hljs-comment">///--- Globals</span>
 
-var SUFFIX = &#39;o=joyent&#39;;
-var db = {};
-var server = ldap.createServer();
+<span class="hljs-keyword">const</span> SUFFIX = <span class="hljs-string">&#x27;o=joyent&#x27;</span>;
+<span class="hljs-keyword">const</span> db = {};
+<span class="hljs-keyword">const</span> server = ldap.createServer();
 
 
 
-server.bind(&#39;cn=root&#39;, function(req, res, next) {
-  if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
-    return next(new ldap.InvalidCredentialsError());
+server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.add(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
+server.add(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
 
-  if (db[dn])
-    return next(new ldap.EntryAlreadyExistsError(dn));
+  <span class="hljs-keyword">if</span> (db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(dn));
 
   db[dn] = req.toObject().attributes;
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.bind(SUFFIX, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
+server.bind(SUFFIX, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+  <span class="hljs-keyword">if</span> (!db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
 
-  if (!db[dn].userpassword)
-    return next(new ldap.NoSuchAttributeError(&#39;userPassword&#39;));
+  <span class="hljs-keyword">if</span> (!db[dn].userpassword)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(<span class="hljs-string">&#x27;userPassword&#x27;</span>));
 
-  if (db[dn].userpassword.indexOf(req.credentials) === -1)
-    return next(new ldap.InvalidCredentialsError());
+  <span class="hljs-keyword">if</span> (db[dn].userpassword.indexOf(req.credentials) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.compare(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
+server.compare(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+  <span class="hljs-keyword">if</span> (!db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
 
-  if (!db[dn][req.attribute])
-    return next(new ldap.NoSuchAttributeError(req.attribute));
+  <span class="hljs-keyword">if</span> (!db[dn][req.attribute])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(req.attribute));
 
-  var matches = false;
-  var vals = db[dn][req.attribute];
-  for (var i = 0; i &lt; vals.length; i++) {
-    if (vals[i] === req.value) {
-      matches = true;
-      break;
+  <span class="hljs-keyword">const</span> matches = <span class="hljs-literal">false</span>;
+  <span class="hljs-keyword">const</span> vals = db[dn][req.attribute];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> value <span class="hljs-keyword">of</span> vals) {
+    <span class="hljs-keyword">if</span> (value === req.value) {
+      matches = <span class="hljs-literal">true</span>;
+      <span class="hljs-keyword">break</span>;
     }
   }
 
   res.end(matches);
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.del(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
+server.del(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+  <span class="hljs-keyword">if</span> (!db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
 
-  delete db[dn];
+  <span class="hljs-keyword">delete</span> db[dn];
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.modify(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!req.changes.length)
-    return next(new ldap.ProtocolError(&#39;changes required&#39;));
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
+server.modify(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+  <span class="hljs-keyword">if</span> (!req.changes.length)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
+  <span class="hljs-keyword">if</span> (!db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
 
-  var entry = db[dn];
+  <span class="hljs-keyword">const</span> entry = db[dn];
 
-  for (var i = 0; i &lt; req.changes.length; i++) {
-    mod = req.changes[i].modification;
-    switch (req.changes[i].operation) {
-    case &#39;replace&#39;:
-      if (!entry[mod.type])
-        return next(new ldap.NoSuchAttributeError(mod.type));
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.changes) {
+    mod = change.modification;
+    <span class="hljs-keyword">switch</span> (change.operation) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
+      <span class="hljs-keyword">if</span> (!entry[mod.type])
+        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(mod.type));
 
-      if (!mod.vals || !mod.vals.length) {
-        delete entry[mod.type];
-      } else {
+      <span class="hljs-keyword">if</span> (!mod.vals || !mod.vals.length) {
+        <span class="hljs-keyword">delete</span> entry[mod.type];
+      } <span class="hljs-keyword">else</span> {
         entry[mod.type] = mod.vals;
       }
 
-      break;
+      <span class="hljs-keyword">break</span>;
 
-    case &#39;add&#39;:
-      if (!entry[mod.type]) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
+      <span class="hljs-keyword">if</span> (!entry[mod.type]) {
         entry[mod.type] = mod.vals;
-      } else {
-        mod.vals.forEach(function(v) {
-          if (entry[mod.type].indexOf(v) === -1)
+      } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> v <span class="hljs-keyword">of</span> mod.vals) {
+          <span class="hljs-keyword">if</span> (entry[mod.type].indexOf(v) === -<span class="hljs-number">1</span>)
             entry[mod.type].push(v);
-        });
+        }
       }
 
-      break;
+      <span class="hljs-keyword">break</span>;
 
-    case &#39;delete&#39;:
-      if (!entry[mod.type])
-        return next(new ldap.NoSuchAttributeError(mod.type));
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
+      <span class="hljs-keyword">if</span> (!entry[mod.type])
+        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(mod.type));
 
-      delete entry[mod.type];
+      <span class="hljs-keyword">delete</span> entry[mod.type];
 
-      break;
+      <span class="hljs-keyword">break</span>;
     }
   }
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
-server.search(SUFFIX, authorize, function(req, res, next) {
-  var dn = req.dn.toString();
-  if (!db[dn])
-    return next(new ldap.NoSuchObjectError(dn));
+server.search(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+  <span class="hljs-keyword">if</span> (!db[dn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
 
-  var scopeCheck;
+  <span class="hljs-keyword">let</span> scopeCheck;
 
-  switch (req.scope) {
-  case &#39;base&#39;:
-    if (req.filter.matches(db[dn])) {
+  <span class="hljs-keyword">switch</span> (req.scope) {
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;base&#x27;</span>:
+    <span class="hljs-keyword">if</span> (req.filter.matches(db[dn])) {
       res.send({
-        dn: dn,
-        attributes: db[dn]
+        <span class="hljs-attr">dn</span>: dn,
+        <span class="hljs-attr">attributes</span>: db[dn]
       });
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
 
-  case &#39;one&#39;:
-    scopeCheck = function(k) {
-      if (req.dn.equals(k))
-        return true;
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;one&#x27;</span>:
+    scopeCheck = <span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> {
+      <span class="hljs-keyword">if</span> (req.dn.equals(k))
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 
-      var parent = ldap.parseDN(k).parent();
-      return (parent ? parent.equals(req.dn) : false);
+      <span class="hljs-keyword">const</span> parent = ldap.parseDN(k).parent();
+      <span class="hljs-keyword">return</span> (parent ? parent.equals(req.dn) : <span class="hljs-literal">false</span>);
     };
-    break;
+    <span class="hljs-keyword">break</span>;
 
-  case &#39;sub&#39;:
-    scopeCheck = function(k) {
-      return (req.dn.equals(k) || req.dn.parentOf(k));
+  <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;sub&#x27;</span>:
+    scopeCheck = <span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> {
+      <span class="hljs-keyword">return</span> (req.dn.equals(k) || req.dn.parentOf(k));
     };
 
-    break;
+    <span class="hljs-keyword">break</span>;
   }
 
-  Object.keys(db).forEach(function(key) {
-    if (!scopeCheck(key))
-      return;
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(db);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key <span class="hljs-keyword">of</span> keys) {
+    <span class="hljs-keyword">if</span> (!scopeCheck(key))
+      <span class="hljs-keyword">return</span>;
 
-    if (req.filter.matches(db[key])) {
+    <span class="hljs-keyword">if</span> (req.filter.matches(db[key])) {
       res.send({
-        dn: key,
-        attributes: db[key]
+        <span class="hljs-attr">dn</span>: key,
+        <span class="hljs-attr">attributes</span>: db[key]
       });
     }
-  });
+  }
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
 
 
-///--- Fire it up
+<span class="hljs-comment">///--- Fire it up</span>
 
-server.listen(1389, function() {
-  console.log(&#39;LDAP server up at: %s&#39;, server.url);
+server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;LDAP server up at: %s&#x27;</span>, server.url);
 });
 </code></pre>
 <h1 id="etcpasswd-server">/etc/passwd server</h1>
-<pre><code>var fs = require(&#39;fs&#39;);
-var ldap = require(&#39;ldapjs&#39;);
-var spawn = require(&#39;child_process&#39;).spawn;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;fs&#x27;</span>);
+<span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
+<span class="hljs-keyword">const</span> { spawn } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;child_process&#x27;</span>);
 
 
 
-///--- Shared handlers
+<span class="hljs-comment">///--- Shared handlers</span>
 
-function authorize(req, res, next) {
-  if (!req.connection.ldap.bindDN.equals(&#39;cn=root&#39;))
-    return next(new ldap.InsufficientAccessRightsError());
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
+  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
 
-  return next();
+  <span class="hljs-keyword">return</span> next();
 }
 
 
-function loadPasswdFile(req, res, next) {
-  fs.readFile(&#39;/etc/passwd&#39;, &#39;utf8&#39;, function(err, data) {
-    if (err)
-      return next(new ldap.OperationsError(err.message));
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) </span>{
+  fs.readFile(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (err)
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(err.message));
 
     req.users = {};
 
-    var lines = data.split(&#39;\n&#39;);
-    for (var i = 0; i &lt; lines.length; i++) {
-      if (!lines[i] || /^#/.test(lines[i]))
-        continue;
+    <span class="hljs-keyword">const</span> lines = data.split(<span class="hljs-string">&#x27;\n&#x27;</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> lines) {
+      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.test(line))
+        <span class="hljs-keyword">continue</span>;
 
-      var record = lines[i].split(&#39;:&#39;);
-      if (!record || !record.length)
-        continue;
+      <span class="hljs-keyword">const</span> record = line.split(<span class="hljs-string">&#x27;:&#x27;</span>);
+      <span class="hljs-keyword">if</span> (!record || !record.length)
+        <span class="hljs-keyword">continue</span>;
 
-      req.users[record[0]] = {
-        dn: &#39;cn=&#39; + record[0] + &#39;, ou=users, o=myhost&#39;,
-        attributes: {
-          cn: record[0],
-          uid: record[2],
-          gid: record[3],
-          description: record[4],
-          homedirectory: record[5],
-          shell: record[6] || &#39;&#39;,
-          objectclass: &#39;unixUser&#39;
+      req.users[record[<span class="hljs-number">0</span>]] = {
+        <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;cn=&#x27;</span> + record[<span class="hljs-number">0</span>] + <span class="hljs-string">&#x27;, ou=users, o=myhost&#x27;</span>,
+        <span class="hljs-attr">attributes</span>: {
+          <span class="hljs-attr">cn</span>: record[<span class="hljs-number">0</span>],
+          <span class="hljs-attr">uid</span>: record[<span class="hljs-number">2</span>],
+          <span class="hljs-attr">gid</span>: record[<span class="hljs-number">3</span>],
+          <span class="hljs-attr">description</span>: record[<span class="hljs-number">4</span>],
+          <span class="hljs-attr">homedirectory</span>: record[<span class="hljs-number">5</span>],
+          <span class="hljs-attr">shell</span>: record[<span class="hljs-number">6</span>] || <span class="hljs-string">&#x27;&#x27;</span>,
+          <span class="hljs-attr">objectclass</span>: <span class="hljs-string">&#x27;unixUser&#x27;</span>
         }
       };
     }
 
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 }
 
 
-var pre = [authorize, loadPasswdFile];
+<span class="hljs-keyword">const</span> pre = [authorize, loadPasswdFile];
 
 
 
-///--- Mainline
+<span class="hljs-comment">///--- Mainline</span>
 
-var server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.createServer();
 
-server.bind(&#39;cn=root&#39;, function(req, res, next) {
-  if (req.dn.toString() !== &#39;cn=root&#39; || req.credentials !== &#39;secret&#39;)
-    return next(new ldap.InvalidCredentialsError());
+server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
 
-server.add(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].cn)
-    return next(new ldap.ConstraintViolationError(&#39;cn required&#39;));
+server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  if (req.users[req.dn.rdns[0].cn])
-    return next(new ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
 
-  var entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
 
-  if (entry.objectclass.indexOf(&#39;unixUser&#39;) === -1)
-    return next(new ldap.ConstraintViolationError(&#39;entry must be a unixUser&#39;));
+  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
 
-  var opts = [&#39;-m&#39;];
-  if (entry.description) {
-    opts.push(&#39;-c&#39;);
-    opts.push(entry.description[0]);
+  <span class="hljs-keyword">const</span> opts = [<span class="hljs-string">&#x27;-m&#x27;</span>];
+  <span class="hljs-keyword">if</span> (entry.description) {
+    opts.push(<span class="hljs-string">&#x27;-c&#x27;</span>);
+    opts.push(entry.description[<span class="hljs-number">0</span>]);
   }
-  if (entry.homedirectory) {
-    opts.push(&#39;-d&#39;);
-    opts.push(entry.homedirectory[0]);
+  <span class="hljs-keyword">if</span> (entry.homedirectory) {
+    opts.push(<span class="hljs-string">&#x27;-d&#x27;</span>);
+    opts.push(entry.homedirectory[<span class="hljs-number">0</span>]);
   }
-  if (entry.gid) {
-    opts.push(&#39;-g&#39;);
-    opts.push(entry.gid[0]);
+  <span class="hljs-keyword">if</span> (entry.gid) {
+    opts.push(<span class="hljs-string">&#x27;-g&#x27;</span>);
+    opts.push(entry.gid[<span class="hljs-number">0</span>]);
   }
-  if (entry.shell) {
-    opts.push(&#39;-s&#39;);
-    opts.push(entry.shell[0]);
+  <span class="hljs-keyword">if</span> (entry.shell) {
+    opts.push(<span class="hljs-string">&#x27;-s&#x27;</span>);
+    opts.push(entry.shell[<span class="hljs-number">0</span>]);
   }
-  if (entry.uid) {
-    opts.push(&#39;-u&#39;);
-    opts.push(entry.uid[0]);
+  <span class="hljs-keyword">if</span> (entry.uid) {
+    opts.push(<span class="hljs-string">&#x27;-u&#x27;</span>);
+    opts.push(entry.uid[<span class="hljs-number">0</span>]);
   }
-  opts.push(entry.cn[0]);
-  var useradd = spawn(&#39;useradd&#39;, opts);
+  opts.push(entry.cn[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">const</span> useradd = spawn(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
 
-  var messages = [];
+  <span class="hljs-keyword">const</span> messages = [];
 
-  useradd.stdout.on(&#39;data&#39;, function(data) {
+  useradd.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
-  useradd.stderr.on(&#39;data&#39;, function(data) {
+  useradd.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
 
-  useradd.on(&#39;exit&#39;, function(code) {
-    if (code !== 0) {
-      var msg = &#39;&#39; + code;
-      if (messages.length)
-        msg += &#39;: &#39; + messages.join();
-      return next(new ldap.OperationsError(msg));
+  useradd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
+      <span class="hljs-keyword">if</span> (messages.length)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 
 
-server.modify(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].cn || !req.users[req.dn.rdns[0].cn])
-    return next(new ldap.NoSuchObjectError(req.dn.toString()));
+server.modify(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
 
-  if (!req.changes.length)
-    return next(new ldap.ProtocolError(&#39;changes required&#39;));
+  <span class="hljs-keyword">if</span> (!req.changes.length)
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
 
-  var user = req.users[req.dn.rdns[0].cn].attributes;
-  var mod;
+  <span class="hljs-keyword">const</span> user = req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn].attributes;
+  <span class="hljs-keyword">let</span> mod;
 
-  for (var i = 0; i &lt; req.changes.length; i++) {
-    mod = req.changes[i].modification;
-    switch (req.changes[i].operation) {
-    case &#39;replace&#39;:
-      if (mod.type !== &#39;userpassword&#39; || !mod.vals || !mod.vals.length)
-        return next(new ldap.UnwillingToPerformError(&#39;only password updates &#39; +
-                                                     &#39;allowed&#39;));
-      break;
-    case &#39;add&#39;:
-    case &#39;delete&#39;:
-      return next(new ldap.UnwillingToPerformError(&#39;only replace allowed&#39;));
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.changes) {
+    mod = change.modification;
+    <span class="hljs-keyword">switch</span> (change.operation) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
+      <span class="hljs-keyword">if</span> (mod.type !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.vals || !mod.vals.length)
+        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
+                                                     <span class="hljs-string">&#x27;allowed&#x27;</span>));
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
+    <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
     }
   }
 
-  var passwd = spawn(&#39;chpasswd&#39;, [&#39;-c&#39;, &#39;MD5&#39;]);
-  passwd.stdin.end(user.cn + &#39;:&#39; + mod.vals[0], &#39;utf8&#39;);
+  <span class="hljs-keyword">const</span> passwd = spawn(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
+  passwd.stdin.end(user.cn + <span class="hljs-string">&#x27;:&#x27;</span> + mod.vals[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
 
-  passwd.on(&#39;exit&#39;, function(code) {
-    if (code !== 0)
-      return next(new ldap.OperationsError(&#39;&#39; + code));
+  passwd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(<span class="hljs-string">&#x27;&#x27;</span> + code));
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 
 
-server.del(&#39;ou=users, o=myhost&#39;, pre, function(req, res, next) {
-  if (!req.dn.rdns[0].cn || !req.users[req.dn.rdns[0].cn])
-    return next(new ldap.NoSuchObjectError(req.dn.toString()));
+server.del(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
+    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
 
-  var userdel = spawn(&#39;userdel&#39;, [&#39;-f&#39;, req.dn.rdns[0].cn]);
+  <span class="hljs-keyword">const</span> userdel = spawn(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.dn.rdns[<span class="hljs-number">0</span>].cn]);
 
-  var messages = [];
-  userdel.stdout.on(&#39;data&#39;, function(data) {
+  <span class="hljs-keyword">const</span> messages = [];
+  userdel.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
-  userdel.stderr.on(&#39;data&#39;, function(data) {
+  userdel.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
     messages.push(data.toString());
   });
 
-  userdel.on(&#39;exit&#39;, function(code) {
-    if (code !== 0) {
-      var msg = &#39;&#39; + code;
-      if (messages.length)
-        msg += &#39;: &#39; + messages.join();
-      return next(new ldap.OperationsError(msg));
+  userdel.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
+      <span class="hljs-keyword">if</span> (messages.length)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 });
 
 
-server.search(&#39;o=myhost&#39;, pre, function(req, res, next) {
-  Object.keys(req.users).forEach(function(k) {
-    if (req.filter.matches(req.users[k].attributes))
+server.search(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(req.users);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> k <span class="hljs-keyword">of</span> keys) {
+    <span class="hljs-keyword">if</span> (req.filter.matches(req.users[k].attributes))
       res.send(req.users[k]);
-  });
+  }
 
   res.end();
-  return next();
+  <span class="hljs-keyword">return</span> next();
 });
 
 
 
-// LDAP &quot;standard&quot; listens on 389, but whatever.
-server.listen(1389, &#39;127.0.0.1&#39;, function() {
-  console.log(&#39;/etc/passwd LDAP server up at: %s&#39;, server.url);
+<span class="hljs-comment">// LDAP &quot;standard&quot; listens on 389, but whatever.</span>
+server.listen(<span class="hljs-number">1389</span>, <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.url);
 });
 </code></pre>
 <h1 id="address-book">Address Book</h1>
 <p>This example is courtesy of <a href="https://github.com/dresende">Diogo Resende</a> and
 illustrates setting up an address book for typical mail clients such as
 Thunderbird or Evolution over a MySQL database.</p>
-<pre><code>// MySQL test: (create on database &#39;abook&#39; with username &#39;abook&#39; and password &#39;abook&#39;)
-//
-// CREATE TABLE IF NOT EXISTS `users` (
-//   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-//   `username` varchar(50) NOT NULL,
-//   `password` varchar(50) NOT NULL,
-//   PRIMARY KEY (`id`),
-//   KEY `username` (`username`)
-// ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-// INSERT INTO `users` (`username`, `password`) VALUES
-// (&#39;demo&#39;, &#39;demo&#39;);
-// CREATE TABLE IF NOT EXISTS `contacts` (
-//   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
-//   `user_id` int(5) unsigned NOT NULL,
-//   `name` varchar(100) NOT NULL,
-//   `email` varchar(255) NOT NULL,
-//   PRIMARY KEY (`id`),
-//   KEY `user_id` (`user_id`)
-// ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-// INSERT INTO `contacts` (`user_id`, `name`, `email`) VALUES
-// (1, &#39;John Doe&#39;, &#39;john.doe@example.com&#39;),
-// (1, &#39;Jane Doe&#39;, &#39;jane.doe@example.com&#39;);
-//
+<pre><code class="language-js"><span class="hljs-comment">// MySQL test: (create on database &#x27;abook&#x27; with username &#x27;abook&#x27; and password &#x27;abook&#x27;)</span>
+<span class="hljs-comment">//</span>
+<span class="hljs-comment">// CREATE TABLE IF NOT EXISTS `users` (</span>
+<span class="hljs-comment">//   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,</span>
+<span class="hljs-comment">//   `username` varchar(50) NOT NULL,</span>
+<span class="hljs-comment">//   `password` varchar(50) NOT NULL,</span>
+<span class="hljs-comment">//   PRIMARY KEY (`id`),</span>
+<span class="hljs-comment">//   KEY `username` (`username`)</span>
+<span class="hljs-comment">// ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;</span>
+<span class="hljs-comment">// INSERT INTO `users` (`username`, `password`) VALUES</span>
+<span class="hljs-comment">// (&#x27;demo&#x27;, &#x27;demo&#x27;);</span>
+<span class="hljs-comment">// CREATE TABLE IF NOT EXISTS `contacts` (</span>
+<span class="hljs-comment">//   `id` int(5) unsigned NOT NULL AUTO_INCREMENT,</span>
+<span class="hljs-comment">//   `user_id` int(5) unsigned NOT NULL,</span>
+<span class="hljs-comment">//   `name` varchar(100) NOT NULL,</span>
+<span class="hljs-comment">//   `email` varchar(255) NOT NULL,</span>
+<span class="hljs-comment">//   PRIMARY KEY (`id`),</span>
+<span class="hljs-comment">//   KEY `user_id` (`user_id`)</span>
+<span class="hljs-comment">// ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;</span>
+<span class="hljs-comment">// INSERT INTO `contacts` (`user_id`, `name`, `email`) VALUES</span>
+<span class="hljs-comment">// (1, &#x27;John Doe&#x27;, &#x27;john.doe@example.com&#x27;),</span>
+<span class="hljs-comment">// (1, &#x27;Jane Doe&#x27;, &#x27;jane.doe@example.com&#x27;);</span>
+<span class="hljs-comment">//</span>
 
-var ldap = require(&#39;ldapjs&#39;),
-    mysql = require(&quot;mysql&quot;),
-    server = ldap.createServer(),
-    addrbooks = {}, userinfo = {},
-    ldap_port = 389,
-    basedn = &quot;dc=example, dc=com&quot;,
-    company = &quot;Example&quot;,
-    db = mysql.createClient({
-      user: &quot;abook&quot;,
-      password: &quot;abook&quot;,
-      database: &quot;abook&quot;
-    });
+<span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
+<span class="hljs-keyword">const</span> mysql = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;mysql&quot;</span>);
+<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> addrbooks = {};
+<span class="hljs-keyword">const</span> userinfo = {};
+<span class="hljs-keyword">const</span> ldap_port = <span class="hljs-number">389</span>;
+<span class="hljs-keyword">const</span> basedn = <span class="hljs-string">&quot;dc=example, dc=com&quot;</span>;
+<span class="hljs-keyword">const</span> company = <span class="hljs-string">&quot;Example&quot;</span>;
+<span class="hljs-keyword">const</span> db = mysql.createClient({
+  <span class="hljs-attr">user</span>: <span class="hljs-string">&quot;abook&quot;</span>,
+  <span class="hljs-attr">password</span>: <span class="hljs-string">&quot;abook&quot;</span>,
+  <span class="hljs-attr">database</span>: <span class="hljs-string">&quot;abook&quot;</span>
+});
 
-db.query(&quot;SELECT c.*,u.username,u.password &quot; +
-         &quot;FROM contacts c JOIN users u ON c.user_id=u.id&quot;,
-         function(err, contacts) {
-  if (err) {
-    console.log(&quot;Error fetching contacts&quot;, err);
-    process.exit(1);
+db.query(<span class="hljs-string">&quot;SELECT c.*,u.username,u.password &quot;</span> +
+         <span class="hljs-string">&quot;FROM contacts c JOIN users u ON c.user_id=u.id&quot;</span>,
+         <span class="hljs-function">(<span class="hljs-params">err, contacts</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (err) {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Error fetching contacts&quot;</span>, err);
+    process.exit(<span class="hljs-number">1</span>);
   }
 
-  for (var i = 0; i &lt; contacts.length; i++) {
-    if (!addrbooks.hasOwnProperty(contacts[i].username)) {
-      addrbooks[contacts[i].username] = [];
-      userinfo[&quot;cn=&quot; + contacts[i].username + &quot;, &quot; + basedn] = {
-        abook: addrbooks[contacts[i].username],
-        pwd: contacts[i].password
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> contact <span class="hljs-keyword">of</span> contacts) {
+    <span class="hljs-keyword">if</span> (!addrbooks.hasOwnProperty(contact.username)) {
+      addrbooks[contact.username] = [];
+      userinfo[<span class="hljs-string">&quot;cn=&quot;</span> + contact.username + <span class="hljs-string">&quot;, &quot;</span> + basedn] = {
+        <span class="hljs-attr">abook</span>: addrbooks[contact.username],
+        <span class="hljs-attr">pwd</span>: contact.password
       };
     }
 
-    var p = contacts[i].name.indexOf(&quot; &quot;);
-    if (p != -1)
-      contacts[i].firstname = contacts[i].name.substr(0, p);
+    <span class="hljs-keyword">const</span> p = contact.name.indexOf(<span class="hljs-string">&quot; &quot;</span>);
+    <span class="hljs-keyword">if</span> (p != -<span class="hljs-number">1</span>)
+      contact.firstname = contact.name.substr(<span class="hljs-number">0</span>, p);
 
-    p = contacts[i].name.lastIndexOf(&quot; &quot;);
-    if (p != -1)
-      contacts[i].surname = contacts[i].name.substr(p + 1);
+    p = contact.name.lastIndexOf(<span class="hljs-string">&quot; &quot;</span>);
+    <span class="hljs-keyword">if</span> (p != -<span class="hljs-number">1</span>)
+      contact.surname = contact.name.substr(p + <span class="hljs-number">1</span>);
 
-    addrbooks[contacts[i].username].push({
-      dn: &quot;cn=&quot; + contacts[i].name + &quot;, &quot; + basedn,
-      attributes: {
-        objectclass: [ &quot;top&quot; ],
-        cn: contacts[i].name,
-        mail: contacts[i].email,
-        givenname: contacts[i].firstname,
-        sn: contacts[i].surname,
-        ou: company
+    addrbooks[contact.username].push({
+      <span class="hljs-attr">dn</span>: <span class="hljs-string">&quot;cn=&quot;</span> + contact.name + <span class="hljs-string">&quot;, &quot;</span> + basedn,
+      <span class="hljs-attr">attributes</span>: {
+        <span class="hljs-attr">objectclass</span>: [ <span class="hljs-string">&quot;top&quot;</span> ],
+        <span class="hljs-attr">cn</span>: contact.name,
+        <span class="hljs-attr">mail</span>: contact.email,
+        <span class="hljs-attr">givenname</span>: contact.firstname,
+        <span class="hljs-attr">sn</span>: contact.surname,
+        <span class="hljs-attr">ou</span>: company
       }
     });
   }
 
-  server.bind(basedn, function (req, res, next) {
-    var username = req.dn.toString(),
-        password = req.credentials;
+  server.bind(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> username = req.dn.toString();
+    <span class="hljs-keyword">const</span> password = req.credentials;
 
-    if (!userinfo.hasOwnProperty(username) ||
+    <span class="hljs-keyword">if</span> (!userinfo.hasOwnProperty(username) ||
          userinfo[username].pwd != password) {
-      return next(new ldap.InvalidCredentialsError());
+      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
     }
 
     res.end();
-    return next();
+    <span class="hljs-keyword">return</span> next();
   });
 
-  server.search(basedn, function(req, res, next) {
-    var binddn = req.connection.ldap.bindDN.toString();
+  server.search(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> binddn = req.connection.ldap.bindDN.toString();
 
-    if (userinfo.hasOwnProperty(binddn)) {
-      for (var i = 0; i &lt; userinfo[binddn].abook.length; i++) {
-        if (req.filter.matches(userinfo[binddn].abook[i].attributes))
-          res.send(userinfo[binddn].abook[i]);
+    <span class="hljs-keyword">if</span> (userinfo.hasOwnProperty(binddn)) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> abook <span class="hljs-keyword">of</span> userinfo[binddn].abook) {
+        <span class="hljs-keyword">if</span> (req.filter.matches(abook.attributes))
+          res.send(abook);
       }
     }
     res.end();
   });
 
-  server.listen(ldap_port, function() {
-    console.log(&quot;Addressbook started at %s&quot;, server.url);
+  server.listen(ldap_port, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Addressbook started at %s&quot;</span>, server.url);
   });
 });
 </code></pre>
 <p>To test out this example, try:</p>
-<pre><code>$ ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
-  -w demo -b &quot;dc=example,dc=com&quot; objectclass=*
+<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
+  -w demo -b <span class="hljs-string">&quot;dc=example,dc=com&quot;</span> objectclass=*</span>
 </code></pre>
 </div><!-- end #content -->
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-    var headerHeight = $("#header").height();
-    var offsets = [];
-    var current = -1;
-
-    function endpoint(scrollDistance) {
-        if (scrollDistance < offsets[0]) {
-            return -1;
-        } else {
-            for (var id = offsets.length; id > 0; id--) {
-                if (scrollDistance > offsets[id - 1]) {
-                    return id - 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    $("h2").each(function(i) {
-        offsets.push($(this).offset().top - headerHeight)
-    });
-
-    $("#content").append('<h2 class="fixed" style="display: none"><span>&nbsp;</span></h2>');
-    var fixed_h2 = $("h2.fixed");
-    var fixed_span = $("h2.fixed span");
-
-    $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
-        var now = endpoint(scrollDistance);
-
-        if (now !== current) {
-            $("#sidebar li").removeClass("current");
-            current = now;
-            if (current < 0) {
-                fixed_h2.hide();
-            } else if (current >= 0) {
-                var heading = $($("h2 span")[current]).text();
-                $("#sidebar a[href|=#" + heading.replace(' ', '-') + "]").parent().addClass("current");
-                fixed_span.text(heading);
-                fixed_h2.show();
-            }
-        }
-    });
-});
-</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
 
 </body>
 </html>

@@ -4,7 +4,7 @@
     <title>Client API | ldapjs</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="media/css/style.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="media/css/highlight.css">
 </head>
 <body>
 <div id="header">
@@ -134,13 +134,14 @@ with LDAP. If you&#39;re not, read the <a href="guide.html">guide</a> first.</p>
 
 <h1 id="create-a-client">Create a client</h1>
 <p>The code to create a new client looks like:</p>
-<pre><code>var ldap = require(&#39;ldapjs&#39;);
-var client = ldap.createClient({
-  url: [&#39;ldap://127.0.0.1:1389&#39;, &#39;ldap://127.0.0.2:1389&#39;]
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
+
+<span class="hljs-keyword">const</span> client = ldap.createClient({
+  <span class="hljs-attr">url</span>: [<span class="hljs-string">&#x27;ldap://127.0.0.1:1389&#x27;</span>, <span class="hljs-string">&#x27;ldap://127.0.0.2:1389&#x27;</span>]
 });
 
-client.on(&#39;error&#39;, (err) =&gt; {
-  // handle connection error
+client.on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+  <span class="hljs-comment">// handle connection error</span>
 })
 </code></pre>
 <p>You can use <code>ldap://</code> or <code>ldaps://</code>; the latter would connect over SSL (note
@@ -293,7 +294,7 @@ You probably won&#39;t need to check the <code>res</code> parameter, but it&#39;
 Authentication) for now. Note that all client APIs can optionally take an array
 of <code>Control</code> objects. You probably don&#39;t need them though...</p>
 <p>Example:</p>
-<pre><code>client.bind(&#39;cn=root&#39;, &#39;secret&#39;, function(err) {
+<pre><code class="language-js">client.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-string">&#x27;secret&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
@@ -303,13 +304,13 @@ of <code>Control</code> objects. You probably don&#39;t need them though...</p>
 <p>Allows you to add an entry (which is just a plain JS object), and as always,
 controls are optional.</p>
 <p>Example:</p>
-<pre><code>var entry = {
-  cn: &#39;foo&#39;,
-  sn: &#39;bar&#39;,
-  email: [&#39;foo@bar.com&#39;, &#39;foo1@bar.com&#39;],
-  objectclass: &#39;fooPerson&#39;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> entry = {
+  <span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>,
+  <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>,
+  <span class="hljs-attr">email</span>: [<span class="hljs-string">&#x27;foo@bar.com&#x27;</span>, <span class="hljs-string">&#x27;foo1@bar.com&#x27;</span>],
+  <span class="hljs-attr">objectclass</span>: <span class="hljs-string">&#x27;fooPerson&#x27;</span>
 };
-client.add(&#39;cn=foo, o=example&#39;, entry, function(err) {
+client.add(<span class="hljs-string">&#x27;cn=foo, o=example&#x27;</span>, entry, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
@@ -318,17 +319,17 @@ client.add(&#39;cn=foo, o=example&#39;, entry, function(err) {
 <p>Performs an LDAP compare operation with the given attribute and value against
 the entry referenced by dn.</p>
 <p>Example:</p>
-<pre><code>client.compare(&#39;cn=foo, o=example&#39;, &#39;sn&#39;, &#39;bar&#39;, function(err, matched) {
+<pre><code class="language-js">client.compare(<span class="hljs-string">&#x27;cn=foo, o=example&#x27;</span>, <span class="hljs-string">&#x27;sn&#x27;</span>, <span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, matched</span>) =&gt;</span> {
   assert.ifError(err);
 
-  console.log(&#39;matched: &#39; + matched);
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;matched: &#x27;</span> + matched);
 });
 </code></pre>
 <h1 id="del">del</h1>
 <p><code>del(dn, controls, callback)</code></p>
 <p>Deletes an entry from the LDAP server.</p>
 <p>Example:</p>
-<pre><code>client.del(&#39;cn=foo, o=example&#39;, function(err) {
+<pre><code class="language-js">client.del(<span class="hljs-string">&#x27;cn=foo, o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
@@ -339,10 +340,10 @@ going to be an OID (well, the RFC says it must be; however, ldapjs has no such
 restriction).  <code>value</code> is completely arbitrary, and is whatever the exop says it
 should be.</p>
 <p>Example (performs an LDAP &#39;whois&#39; extended op):</p>
-<pre><code>client.exop(&#39;1.3.6.1.4.1.4203.1.11.3&#39;, function(err, value, res) {
+<pre><code class="language-js">client.exop(<span class="hljs-string">&#x27;1.3.6.1.4.1.4203.1.11.3&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, value, res</span>) =&gt;</span> {
   assert.ifError(err);
 
-  console.log(&#39;whois: &#39; + value);
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;whois: &#x27;</span> + value);
 });
 </code></pre>
 <h1 id="modify">modify</h1>
@@ -351,14 +352,14 @@ should be.</p>
 you to pass in a <code>Change</code> object, which is described below.  Note that you can
 pass in a single <code>Change</code> or an array of <code>Change</code> objects.</p>
 <p>Example:</p>
-<pre><code>var change = new ldap.Change({
-  operation: &#39;add&#39;,
-  modification: {
-    pets: [&#39;cat&#39;, &#39;dog&#39;]
+<pre><code class="language-js"><span class="hljs-keyword">const</span> change = <span class="hljs-keyword">new</span> ldap.Change({
+  <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;add&#x27;</span>,
+  <span class="hljs-attr">modification</span>: {
+    <span class="hljs-attr">pets</span>: [<span class="hljs-string">&#x27;cat&#x27;</span>, <span class="hljs-string">&#x27;dog&#x27;</span>]
   }
 });
 
-client.modify(&#39;cn=foo, o=example&#39;, change, function(err) {
+client.modify(<span class="hljs-string">&#x27;cn=foo, o=example&#x27;</span>, change, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
@@ -399,7 +400,7 @@ superior&quot; request (&quot;new superior&quot; means move to a different part 
 as opposed to just renaming the leaf).</li>
 </ul>
 <p>Example:</p>
-<pre><code>client.modifyDN(&#39;cn=foo, o=example&#39;, &#39;cn=bar&#39;, function(err) {
+<pre><code class="language-js">client.modifyDN(<span class="hljs-string">&#x27;cn=foo, o=example&#x27;</span>, <span class="hljs-string">&#x27;cn=bar&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
@@ -460,26 +461,26 @@ can give you a lot of status codes, such as time or size exceeded, busy,
 inappropriate matching, etc., which is why this method doesn&#39;t try to wrap up
 the code matching.</p>
 <p>Example:</p>
-<pre><code>var opts = {
-  filter: &#39;(&amp;(l=Seattle)(email=*@foo.com))&#39;,
-  scope: &#39;sub&#39;,
-  attributes: [&#39;dn&#39;, &#39;sn&#39;, &#39;cn&#39;]
+<pre><code class="language-js"><span class="hljs-keyword">const</span> opts = {
+  <span class="hljs-attr">filter</span>: <span class="hljs-string">&#x27;(&amp;(l=Seattle)(email=*@foo.com))&#x27;</span>,
+  <span class="hljs-attr">scope</span>: <span class="hljs-string">&#x27;sub&#x27;</span>,
+  <span class="hljs-attr">attributes</span>: [<span class="hljs-string">&#x27;dn&#x27;</span>, <span class="hljs-string">&#x27;sn&#x27;</span>, <span class="hljs-string">&#x27;cn&#x27;</span>]
 };
 
-client.search(&#39;o=example&#39;, opts, function(err, res) {
+client.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, opts, <span class="hljs-function">(<span class="hljs-params">err, res</span>) =&gt;</span> {
   assert.ifError(err);
 
-  res.on(&#39;searchEntry&#39;, function(entry) {
-    console.log(&#39;entry: &#39; + JSON.stringify(entry.object));
+  res.on(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;entry: &#x27;</span> + <span class="hljs-built_in">JSON</span>.stringify(entry.object));
   });
-  res.on(&#39;searchReference&#39;, function(referral) {
-    console.log(&#39;referral: &#39; + referral.uris.join());
+  res.on(<span class="hljs-string">&#x27;searchReference&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">referral</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;referral: &#x27;</span> + referral.uris.join());
   });
-  res.on(&#39;error&#39;, function(err) {
-    console.error(&#39;error: &#39; + err.message);
+  res.on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.error(<span class="hljs-string">&#x27;error: &#x27;</span> + err.message);
   });
-  res.on(&#39;end&#39;, function(result) {
-    console.log(&#39;status: &#39; + result.status);
+  res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;status: &#x27;</span> + result.status);
   });
 });
 </code></pre>
@@ -521,25 +522,25 @@ While callers could choose to do this manually via the <code>controls</code> par
 <code>search()</code>, ldapjs has internal mechanisms to easily automate the process.  The
 most simple way to use the paging automation is to set the <code>paged</code> option to
 true when performing a search:</p>
-<pre><code>var opts = {
-  filter: &#39;(objectclass=commonobject)&#39;,
-  scope: &#39;sub&#39;,
-  paged: true,
-  sizeLimit: 200
+<pre><code class="language-js"><span class="hljs-keyword">const</span> opts = {
+  <span class="hljs-attr">filter</span>: <span class="hljs-string">&#x27;(objectclass=commonobject)&#x27;</span>,
+  <span class="hljs-attr">scope</span>: <span class="hljs-string">&#x27;sub&#x27;</span>,
+  <span class="hljs-attr">paged</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">sizeLimit</span>: <span class="hljs-number">200</span>
 };
-client.search(&#39;o=largedir&#39;, opts, function(err, res) {
+client.search(<span class="hljs-string">&#x27;o=largedir&#x27;</span>, opts, <span class="hljs-function">(<span class="hljs-params">err, res</span>) =&gt;</span> {
   assert.ifError(err);
-  res.on(&#39;searchEntry&#39;, function(entry) {
-    // do per-entry processing
+  res.on(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
+    <span class="hljs-comment">// do per-entry processing</span>
   });
-  res.on(&#39;page&#39;, function(result) {
-    console.log(&#39;page end&#39;);
+  res.on(<span class="hljs-string">&#x27;page&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;page end&#x27;</span>);
   });
-  res.on(&#39;error&#39;, function(resErr) {
+  res.on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">resErr</span>) =&gt;</span> {
     assert.ifError(resErr);
   });
-  res.on(&#39;end&#39;, function(result) {
-    console.log(&#39;done &#39;);
+  res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;done &#x27;</span>);
   });
 });
 </code></pre>
@@ -556,30 +557,30 @@ paged search operation by pausing  at the end of each page.  When enabled, a
 callback function is passed as an additional parameter to <code>page</code> events.  The
 client will wait to request the next page until that callback is executed.</p>
 <p>Here is an example where both of those parameters are used:</p>
-<pre><code>var queue = new MyWorkQueue(someSlowWorkFunction);
-var opts = {
-  filter: &#39;(objectclass=commonobject)&#39;,
-  scope: &#39;sub&#39;,
-  paged: {
-    pageSize: 250,
-    pagePause: true
+<pre><code class="language-js"><span class="hljs-keyword">const</span> queue = <span class="hljs-keyword">new</span> MyWorkQueue(someSlowWorkFunction);
+<span class="hljs-keyword">const</span> opts = {
+  <span class="hljs-attr">filter</span>: <span class="hljs-string">&#x27;(objectclass=commonobject)&#x27;</span>,
+  <span class="hljs-attr">scope</span>: <span class="hljs-string">&#x27;sub&#x27;</span>,
+  <span class="hljs-attr">paged</span>: {
+    <span class="hljs-attr">pageSize</span>: <span class="hljs-number">250</span>,
+    <span class="hljs-attr">pagePause</span>: <span class="hljs-literal">true</span>
   },
 };
-client.search(&#39;o=largerdir&#39;, opts, function(err, res) {
+client.search(<span class="hljs-string">&#x27;o=largerdir&#x27;</span>, opts, <span class="hljs-function">(<span class="hljs-params">err, res</span>) =&gt;</span> {
   assert.ifError(err);
-  res.on(&#39;searchEntry&#39;, function(entry) {
-    // Submit incoming objects to queue
+  res.on(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
+    <span class="hljs-comment">// Submit incoming objects to queue</span>
     queue.push(entry);
   });
-  res.on(&#39;page&#39;, function(result, cb) {
-    // Allow the queue to flush before fetching next page
+  res.on(<span class="hljs-string">&#x27;page&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result, cb</span>) =&gt;</span> {
+    <span class="hljs-comment">// Allow the queue to flush before fetching next page</span>
     queue.cbWhenFlushed(cb);
   });
-  res.on(&#39;error&#39;, function(resErr) {
+  res.on(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">resErr</span>) =&gt;</span> {
     assert.ifError(resErr);
   });
-  res.on(&#39;end&#39;, function(result) {
-    console.log(&#39;done&#39;);
+  res.on(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">result</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;done&#x27;</span>);
   });
 });
 </code></pre>
@@ -587,14 +588,14 @@ client.search(&#39;o=largerdir&#39;, opts, function(err, res) {
 <p><code>starttls(options, controls, callback)</code></p>
 <p>Attempt to secure existing LDAP connection via STARTTLS.</p>
 <p>Example:</p>
-<pre><code>var opts = {
-  ca: [fs.readFileSync(&#39;mycacert.pem&#39;)]
+<pre><code class="language-js"><span class="hljs-keyword">const</span> opts = {
+  <span class="hljs-attr">ca</span>: [fs.readFileSync(<span class="hljs-string">&#x27;mycacert.pem&#x27;</span>)]
 };
 
-client.starttls(opts, function(err, res) {
+client.starttls(opts, <span class="hljs-function">(<span class="hljs-params">err, res</span>) =&gt;</span> {
   assert.ifError(err);
 
-  // Client communication now TLS protected
+  <span class="hljs-comment">// Client communication now TLS protected</span>
 });
 </code></pre>
 <h1 id="unbind">unbind</h1>
@@ -606,58 +607,14 @@ regardless of whether a bind operation was performed.</p>
 <p>The <code>callback</code> argument is optional as unbind does
 not have a response.</p>
 <p>Example:</p>
-<pre><code>client.unbind(function(err) {
+<pre><code class="language-js">client.unbind(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   assert.ifError(err);
 });
 </code></pre>
 </div><!-- end #content -->
 
-<script type="text/javascript" charset="utf-8">
-$(function() {
-    var headerHeight = $("#header").height();
-    var offsets = [];
-    var current = -1;
-
-    function endpoint(scrollDistance) {
-        if (scrollDistance < offsets[0]) {
-            return -1;
-        } else {
-            for (var id = offsets.length; id > 0; id--) {
-                if (scrollDistance > offsets[id - 1]) {
-                    return id - 1;
-                    break;
-                }
-            }
-        }
-    }
-
-    $("h2").each(function(i) {
-        offsets.push($(this).offset().top - headerHeight)
-    });
-
-    $("#content").append('<h2 class="fixed" style="display: none"><span>&nbsp;</span></h2>');
-    var fixed_h2 = $("h2.fixed");
-    var fixed_span = $("h2.fixed span");
-
-    $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
-        var now = endpoint(scrollDistance);
-
-        if (now !== current) {
-            $("#sidebar li").removeClass("current");
-            current = now;
-            if (current < 0) {
-                fixed_h2.hide();
-            } else if (current >= 0) {
-                var heading = $($("h2 span")[current]).text();
-                $("#sidebar a[href|=#" + heading.replace(' ', '-') + "]").parent().addClass("current");
-                fixed_span.text(heading);
-                fixed_h2.show();
-            }
-        }
-    });
-});
-</script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
 
 </body>
 </html>
