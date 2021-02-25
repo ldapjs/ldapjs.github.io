@@ -123,7 +123,7 @@ syntactically invalid string).</p>
 <h1 id="equalityfilter">EqualityFilter</h1>
 <p>The equality filter is used to check exact matching of attribute/value
 assertions.  This object will have an <code>attribute</code> and <code>value</code> property, and the
-<code>name</code> proerty will be <code>equal</code>.</p>
+<code>name</code> property will be <code>equal</code>.</p>
 <p>The string syntax for an equality filter is <code>(attr=value)</code>.</p>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and a value matching <code>value</code>.</p>
@@ -299,7 +299,7 @@ f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;fo
 <h1 id="approximatefilter">ApproximateFilter</h1>
 <p>The approximate filter is used to check &quot;approximate&quot; matching of
 attribute/value assertions.  This object will have an <code>attribute</code> and
-<code>value</code> property, and the <code>name</code> proerty will be <code>approx</code>.</p>
+<code>value</code> property, and the <code>name</code> property will be <code>approx</code>.</p>
 <p>As a side point, this is a useless filter. It&#39;s really only here if you have
 some whacky client that&#39;s sending this.  It just does an exact match (which
 is what ActiveDirectory does too).</p>
