@@ -451,15 +451,15 @@ containing the following fields:</p>
 <td>enable and/or configure automatic result paging</td>
 </tr>
 </tbody></table>
-<p>Responses from the <code>search</code> method are an <code>EventEmitter</code> where you will get a
-notification for each <code>searchEntry</code> that comes back from the server.  You will
-additionally be able to listen for a <code>searchReference</code>, <code>error</code> and <code>end</code> event.
-Note that the <code>error</code> event will only be for client/TCP errors, not LDAP error
-codes like the other APIs.  You&#39;ll want to check the LDAP status code
-(likely for <code>0</code>) on the <code>end</code> event to assert success.  LDAP search results
-can give you a lot of status codes, such as time or size exceeded, busy,
-inappropriate matching, etc., which is why this method doesn&#39;t try to wrap up
-the code matching.</p>
+<p>Responses inside callback of the <code>search</code> method are an <code>EventEmitter</code> where you will get a notification for
+each <code>searchEntry</code> that comes back from the server. You will additionally be able to listen for a <code>searchRequest</code>
+, <code>searchReference</code>, <code>error</code> and <code>end</code> event.
+<code>searchRequest</code> is emitted immediately after every <code>SearchRequest</code> is sent with a <code>SearchRequest</code> parameter. You can do operations
+like <code>client.abandon</code> with <code>searchRequest.messageID</code> to abandon this search request. Note that the <code>error</code> event will
+only be for client/TCP errors, not LDAP error codes like the other APIs. You&#39;ll want to check the LDAP status code
+(likely for <code>0</code>) on the <code>end</code> event to assert success. LDAP search results can give you a lot of status codes, such as
+time or size exceeded, busy, inappropriate matching, etc., which is why this method doesn&#39;t try to wrap up the code
+matching.</p>
 <p>Example:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> opts = {
   <span class="hljs-attr">filter</span>: <span class="hljs-string">&#x27;(&amp;(l=Seattle)(email=*@foo.com))&#x27;</span>,
@@ -470,6 +470,9 @@ the code matching.</p>
 client.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, opts, <span class="hljs-function">(<span class="hljs-params">err, res</span>) =&gt;</span> {
   assert.ifError(err);
 
+  res.on(<span class="hljs-string">&#x27;searchRequest&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">searchRequest</span>) =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;searchRequest: &#x27;</span>, searchRequest.messageID);
+  });
   res.on(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;entry: &#x27;</span> + <span class="hljs-built_in">JSON</span>.stringify(entry.object));
   });
