@@ -180,7 +180,7 @@ useful to you, then that&#39;s gravy.</p>
 <p>If you don&#39;t already have node.js and npm, clearly you need those, so follow
 the steps at <a href="http://nodejs.org">nodejs.org</a> and <a href="http://npmjs.org">npmjs.org</a>,
 respectively.  After that, run:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> npm install ldapjs</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">npm install ldapjs</span>
 </code></pre>
 <p>Rather than overload you with client-side programming for now, we&#39;ll use
 the OpenLDAP CLI to interact with our server.  It&#39;s almost certainly already
@@ -190,15 +190,15 @@ package manager here.</p>
 created:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 
-<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 
-server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.url);
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.<span class="hljs-property">url</span>);
 });
 </code></pre>
 <p>And run that.  Doing anything will give you errors (LDAP &quot;No Such Object&quot;)
 since we haven&#39;t added any support in yet, but go ahead and try it anyway:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 </code></pre>
 <p>Before we go any further, note that the complete code for the server we are
 about to build up is on the <a href="examples.html">examples</a> page.</p>
@@ -215,12 +215,12 @@ and get it out of our way.</p>
 has no correspondence to our Unix root user, it&#39;s just something we&#39;re making up
 and going to use for allowing an (LDAP) admin to do anything.  To do so, add
 this code into your file:</p>
-<pre><code class="language-js">server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
+<pre><code class="language-js">server.<span class="hljs-title function_">bind</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.<span class="hljs-property">credentials</span> !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InvalidCredentialsError</span>());
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 </code></pre>
 <p>Not very secure, but this is a demo.  What we did there was &quot;mount&quot; a tree in
@@ -228,7 +228,7 @@ the ldapjs server, and add a handler for the <em>bind</em> method.  If you&#39;v
 express, this pattern should be really familiar; you can add any number of
 handlers in, as we&#39;ll see later.</p>
 <p>On to the meat of the method.  What&#39;s up with this?</p>
-<pre><code class="language-js"><span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+<pre><code class="language-js"><span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.<span class="hljs-property">credentials</span> !== <span class="hljs-string">&#x27;secret&#x27;</span>)
 </code></pre>
 <p>The first part <code>req.dn.toString() !== &#39;cn=root&#39;</code>:  you&#39;re probably thinking
 &quot;WTF?!? Does ldapjs allow something other than cn=root into this handler?&quot; Sort
@@ -249,14 +249,14 @@ send the proper error code back to the client.</p>
 have one handler in the chain, but it&#39;s good habit to always do that, so if you
 add another handler in later you won&#39;t get bit by it not being invoked.</p>
 <p>Blah blah, let&#39;s try running the ldap client again, first with a bad password:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 ldap_bind: Invalid credentials (49)
     matched DN: cn=root
     additional info: Invalid Credentials
 </code></pre>
 <p>And again with the correct one:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 No such object (32)
 Additional information: No tree found for: o=myhost
@@ -271,11 +271,11 @@ we added a bind route, so the only user that can authenticate is <code>cn=root</
 what if the remote end doesn&#39;t authenticate at all? Right, nothing says they
 <em>have to</em> bind, that&#39;s just what the common clients do.  Let&#39;s add a quick
 authorization handler that we&#39;ll use in all our subsequent routes:</p>
-<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">authorize</span>(<span class="hljs-params">req, res, next</span>) {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">connection</span>.<span class="hljs-property">ldap</span>.<span class="hljs-property">bindDN</span>.<span class="hljs-title function_">equals</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InsufficientAccessRightsError</span>());
 
-  <span class="hljs-keyword">return</span> next();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 }
 </code></pre>
 <p>Should be pretty self-explanatory, but as a reminder, LDAP is connection
@@ -327,23 +327,23 @@ for a moment to explain an /etc/passwd record.</p>
 record (note, you&#39;ll need to add <code>const fs = require(&#39;fs&#39;);</code> at the top of the
 source file).</p>
 <p>First, make a handler that just loads the &quot;user database&quot; in a &quot;pre&quot; handler:</p>
-<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  fs.readFile(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) {
+  fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (err)
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(err.message));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(err.<span class="hljs-property">message</span>));
 
-    req.users = {};
+    req.<span class="hljs-property">users</span> = {};
 
-    <span class="hljs-keyword">const</span> lines = data.split(<span class="hljs-string">&#x27;\n&#x27;</span>);
+    <span class="hljs-keyword">const</span> lines = data.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;\n&#x27;</span>);
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> lines) {
-      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.test(line))
+      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.<span class="hljs-title function_">test</span>(line))
         <span class="hljs-keyword">continue</span>;
 
-      <span class="hljs-keyword">const</span> record = line.split(<span class="hljs-string">&#x27;:&#x27;</span>);
-      <span class="hljs-keyword">if</span> (!record || !record.length)
+      <span class="hljs-keyword">const</span> record = line.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;:&#x27;</span>);
+      <span class="hljs-keyword">if</span> (!record || !record.<span class="hljs-property">length</span>)
         <span class="hljs-keyword">continue</span>;
 
-      req.users[record[<span class="hljs-number">0</span>]] = {
+      req.<span class="hljs-property">users</span>[record[<span class="hljs-number">0</span>]] = {
         <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;cn=&#x27;</span> + record[<span class="hljs-number">0</span>] + <span class="hljs-string">&#x27;, ou=users, o=myhost&#x27;</span>,
         <span class="hljs-attr">attributes</span>: {
           <span class="hljs-attr">cn</span>: record[<span class="hljs-number">0</span>],
@@ -357,7 +357,7 @@ source file).</p>
       };
     }
 
-    <span class="hljs-keyword">return</span> next();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 }
 </code></pre>
@@ -366,19 +366,19 @@ subsequent handler doesn&#39;t have to reload the file.  Next, let&#39;s write a
 handler to process that:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> pre = [authorize, loadPasswdFile];
 
-server.search(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(req.users);
+server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">keys</span>(req.<span class="hljs-property">users</span>);
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> k <span class="hljs-keyword">of</span> keys) {
-    <span class="hljs-keyword">if</span> (req.filter.matches(req.users[k].attributes))
-      res.send(req.users[k]);
+    <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(req.<span class="hljs-property">users</span>[k].<span class="hljs-property">attributes</span>))
+      res.<span class="hljs-title function_">send</span>(req.<span class="hljs-property">users</span>[k]);
   }
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 </code></pre>
 <p>And try running:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 dn: cn=root, ou=users, o=myhost
 cn: root
 uid: 0
@@ -389,14 +389,14 @@ shell: /bin/sh
 objectclass: unixUser
 </code></pre>
 <p>Sweet! Try this out too:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 ...
 </code></pre>
 <p>You should have seen an entry for every record in /etc/passwd with the second.
 What all did we do here?  A lot.  Let&#39;s break this down...</p>
 <h3 id="what-did-i-just-do-on-the-command-line">What did I just do on the command line?</h3>
 <p>Let&#39;s start with looking at what you even asked for:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 </code></pre>
 <p>We can throw away <code>ldapsearch -H -x -D -w -LLL</code>, as those just specify the URL
 to connect to, the bind credentials and the <code>-LLL</code> just quiets down OpenLDAP.
@@ -447,7 +447,7 @@ LDAP server over riak.</p>
 shell set to <code>/bin/false</code> and whose name starts with <code>p</code> (I&#39;m doing this
 on Ubuntu).  Then, let&#39;s say we only care about their login name and primary
 group id.  We&#39;d do this:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> <span class="hljs-string">&quot;(&amp;(shell=/bin/false)(cn=p*))&quot;</span> cn gid</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> <span class="hljs-string">&quot;(&amp;(shell=/bin/false)(cn=p*))&quot;</span> cn gid</span>
 dn: cn=proxy, ou=users, o=myhost
 cn: proxy
 gid: 13
@@ -461,61 +461,61 @@ gid: 114
 use node&#39;s child process module to spawn calls to <code>adduser</code>.  Go ahead and add
 the following code in as another handler (you&#39;ll need a
 <code>const { spawn } = require(&#39;child_process&#39;);</code> at the top of your file):</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">EntryAlreadyExistsError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.<span class="hljs-title function_">toObject</span>().<span class="hljs-property">attributes</span>;
 
-  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">objectclass</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
 
   <span class="hljs-keyword">const</span> opts = [<span class="hljs-string">&#x27;-m&#x27;</span>];
-  <span class="hljs-keyword">if</span> (entry.description) {
-    opts.push(<span class="hljs-string">&#x27;-c&#x27;</span>);
-    opts.push(entry.description[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">description</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-c&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">description</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.homedirectory) {
-    opts.push(<span class="hljs-string">&#x27;-d&#x27;</span>);
-    opts.push(entry.homedirectory[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">homedirectory</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-d&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">homedirectory</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.gid) {
-    opts.push(<span class="hljs-string">&#x27;-g&#x27;</span>);
-    opts.push(entry.gid[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">gid</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-g&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">gid</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.shell) {
-    opts.push(<span class="hljs-string">&#x27;-s&#x27;</span>);
-    opts.push(entry.shell[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">shell</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-s&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">shell</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.uid) {
-    opts.push(<span class="hljs-string">&#x27;-u&#x27;</span>);
-    opts.push(entry.uid[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">uid</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-u&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">uid</span>[<span class="hljs-number">0</span>]);
   }
-  opts.push(entry.cn[<span class="hljs-number">0</span>]);
-  <span class="hljs-keyword">const</span> useradd = spawn(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
+  opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">cn</span>[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">const</span> useradd = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
 
   <span class="hljs-keyword">const</span> messages = [];
 
-  useradd.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  useradd.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
-  useradd.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  useradd.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
 
-  useradd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  useradd.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
       <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
-      <span class="hljs-keyword">if</span> (messages.length)
-        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
+      <span class="hljs-keyword">if</span> (messages.<span class="hljs-property">length</span>)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.<span class="hljs-title function_">join</span>();
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(msg));
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 </code></pre>
@@ -529,11 +529,11 @@ shell: /bin/bash
 description: Created via ldapadd
 </code></pre>
 <p>Now go ahead and invoke with:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif</span>
 adding new entry &quot;cn=ldapjs, ou=users, o=myhost&quot;
 </code></pre>
 <p>Let&#39;s confirm he got added with an ldapsearch:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b <span class="hljs-string">&quot;ou=users, o=myhost&quot;</span> cn=ldapjs</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b <span class="hljs-string">&quot;ou=users, o=myhost&quot;</span> cn=ldapjs</span>
 dn: cn=ldapjs, ou=users, o=myhost
 cn: ldapjs
 uid: 1001
@@ -544,17 +544,17 @@ shell: /bin/bash
 objectclass: unixUser
 </code></pre>
 <p>As before, here&#39;s a breakdown of the code:</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">EntryAlreadyExistsError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.<span class="hljs-title function_">toObject</span>().<span class="hljs-property">attributes</span>;
 
-  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">objectclass</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
 });
 </code></pre>
 <p>A few new things:</p>
@@ -588,39 +588,39 @@ support that via the <em>modify</em> command.</p>
 <p>Unlike HTTP, &quot;partial&quot; document updates are fully specified as part of the
 RFC, so appending, removing, or replacing a single attribute is pretty natural.
 Go ahead and add the following code into your source file:</p>
-<pre><code class="language-js">server.modify(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
+<pre><code class="language-js">server.<span class="hljs-title function_">modify</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span> || !req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">if</span> (!req.changes.length)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">changes</span>.<span class="hljs-property">length</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ProtocolError</span>(<span class="hljs-string">&#x27;changes required&#x27;</span>));
 
-  <span class="hljs-keyword">const</span> user = req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value].attributes;
+  <span class="hljs-keyword">const</span> user = req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>].<span class="hljs-property">attributes</span>;
   <span class="hljs-keyword">let</span> mod;
 
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">0</span>; i &lt; req.changes.length; i++) {
-    mod = req.changes[i].modification;
-    <span class="hljs-keyword">switch</span> (req.changes[i].operation) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i = <span class="hljs-number">0</span>; i &lt; req.<span class="hljs-property">changes</span>.<span class="hljs-property">length</span>; i++) {
+    mod = req.<span class="hljs-property">changes</span>[i].<span class="hljs-property">modification</span>;
+    <span class="hljs-keyword">switch</span> (req.<span class="hljs-property">changes</span>[i].<span class="hljs-property">operation</span>) {
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
-      <span class="hljs-keyword">if</span> (mod.type !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.vals || !mod.vals.length)
-        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
+      <span class="hljs-keyword">if</span> (mod.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.<span class="hljs-property">vals</span> || !mod.<span class="hljs-property">vals</span>.<span class="hljs-property">length</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">UnwillingToPerformError</span>(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
                                                      <span class="hljs-string">&#x27;allowed&#x27;</span>));
       <span class="hljs-keyword">break</span>;
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">UnwillingToPerformError</span>(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
     }
   }
 
-  <span class="hljs-keyword">const</span> passwd = spawn(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
-  passwd.stdin.end(user.cn + <span class="hljs-string">&#x27;:&#x27;</span> + mod.vals[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
+  <span class="hljs-keyword">const</span> passwd = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
+  passwd.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">end</span>(user.<span class="hljs-property">cn</span> + <span class="hljs-string">&#x27;:&#x27;</span> + mod.<span class="hljs-property">vals</span>[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
 
-  passwd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  passwd.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(code));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(code));
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 </code></pre>
@@ -637,42 +637,42 @@ userPassword: secret
 -
 </code></pre>
 <p>And then run the OpenLDAP CLI:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</span>
 </code></pre>
 <p>You should now be able to login to your box as the ldapjs user. Let&#39;s get
 the last &quot;mainline&quot; piece of work out of the way, and delete the user.</p>
 <h2 id="delete">Delete</h2>
 <p>Delete is pretty straightforward. The client gives you a dn to delete, and you
 delete it :).  Add the following code into your server:</p>
-<pre><code class="language-js">server.del(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
+<pre><code class="language-js">server.<span class="hljs-title function_">del</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span> || !req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">const</span> userdel = spawn(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.dn.rdns[<span class="hljs-number">0</span>].attrs.cn.value]);
+  <span class="hljs-keyword">const</span> userdel = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">attrs</span>.<span class="hljs-property">cn</span>.<span class="hljs-property">value</span>]);
 
   <span class="hljs-keyword">const</span> messages = [];
-  userdel.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  userdel.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
-  userdel.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  userdel.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
 
-  userdel.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  userdel.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
       <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
-      <span class="hljs-keyword">if</span> (messages.length)
-        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
+      <span class="hljs-keyword">if</span> (messages.<span class="hljs-property">length</span>)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.<span class="hljs-title function_">join</span>();
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(msg));
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 </code></pre>
 <p>And then run the following command:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret <span class="hljs-string">&quot;cn=ldapjs, ou=users, o=myhost&quot;</span></span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret <span class="hljs-string">&quot;cn=ldapjs, ou=users, o=myhost&quot;</span></span>
 </code></pre>
 <h1 id="where-to-go-from-here">Where to go from here</h1>
 <p>The complete source code for this example server is available in

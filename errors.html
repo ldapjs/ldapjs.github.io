@@ -54,14 +54,14 @@ a <code>stack</code> property correctly set.</p>
 
 <span class="hljs-keyword">const</span> db = {};
 
-server.add(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> parent = req.dn.parent();
+server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> parent = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">parent</span>();
   <span class="hljs-keyword">if</span> (parent) {
-    <span class="hljs-keyword">if</span> (!db[parent.toString()])
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(parent.toString()));
+    <span class="hljs-keyword">if</span> (!db[parent.<span class="hljs-title function_">toString</span>()])
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(parent.<span class="hljs-title function_">toString</span>()));
   }
-  <span class="hljs-keyword">if</span> (db[req.dn.toString()])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (db[req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">EntryAlreadyExistsError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
   ...
 });

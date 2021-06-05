@@ -100,10 +100,10 @@ identifies an entry in the tree, and is read &quot;bottom up&quot;.</p>
 <p>The <code>parseDN</code> API converts a string representation of a DN into an ldapjs DN
 object; in most cases this will be handled for you under the covers of the
 ldapjs framework, but if you need it, it&#39;s there.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> parseDN = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>).parseDN;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> parseDN = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>).<span class="hljs-property">parseDN</span>;
 
-<span class="hljs-keyword">const</span> dn = parseDN(<span class="hljs-string">&#x27;cn=foo+sn=bar, ou=people, o=example&#x27;</span>);
-<span class="hljs-built_in">console</span>.log(dn.toString());
+<span class="hljs-keyword">const</span> dn = <span class="hljs-title function_">parseDN</span>(<span class="hljs-string">&#x27;cn=foo+sn=bar, ou=people, o=example&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(dn.<span class="hljs-title function_">toString</span>());
 </code></pre>
 <h1 id="dn">DN</h1>
 <p>The DN object is largely what you&#39;ll be interacting with, since all the server
@@ -111,8 +111,8 @@ APIs are setup to give you a DN object.</p>
 <h2 id="childofdn">childOf(dn)</h2>
 <p>Returns a boolean indicating whether &#39;this&#39; is a child of the passed in dn. The
 <code>dn</code> argument can be either a string or a DN.</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (req.dn.childOf(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>)) {
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">childOf</span>(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>)) {
     ...
   } <span class="hljs-keyword">else</span> {
     ...
@@ -122,9 +122,9 @@ APIs are setup to give you a DN object.</p>
 <h2 id="parentofdn">parentOf(dn)</h2>
 <p>The inverse of <code>childOf</code>; returns a boolean on whether or not <code>this</code> is a parent
 of the passed in dn.  Like <code>childOf</code>, can take either a string or a DN.</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = parseDN(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>);
-  <span class="hljs-keyword">if</span> (dn.parentOf(req.dn)) {
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = <span class="hljs-title function_">parseDN</span>(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>);
+  <span class="hljs-keyword">if</span> (dn.<span class="hljs-title function_">parentOf</span>(req.<span class="hljs-property">dn</span>)) {
     ...
   } <span class="hljs-keyword">else</span> {
     ...
@@ -134,8 +134,8 @@ of the passed in dn.  Like <code>childOf</code>, can take either a string or a D
 <h2 id="equalsdn">equals(dn)</h2>
 <p>Returns a boolean indicating whether <code>this</code> is equivalent to the passed in <code>dn</code>
 argument. <code>dn</code> can be a string or a DN.</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (req.dn.equals(<span class="hljs-string">&#x27;cn=foo, ou=people, o=example&#x27;</span>)) {
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">equals</span>(<span class="hljs-string">&#x27;cn=foo, ou=people, o=example&#x27;</span>)) {
     ...
   } <span class="hljs-keyword">else</span> {
     ...
@@ -168,8 +168,8 @@ precedence over Modification Options.</p>
 It accepts the same parameters as <code>format</code>.</p>
 <h2 id="tostring">toString()</h2>
 <p>Returns the string representation of <code>this</code>.</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(req.dn.toString());
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
 });
 </code></pre>
 

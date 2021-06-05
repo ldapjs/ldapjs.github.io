@@ -109,12 +109,12 @@ will be one of:</p>
 <p>Parses an <a href="http://www.ietf.org/rfc/rfc2254.txt">RFC2254</a> filter string into an
 ldapjs object(s).  If the filter is &quot;complex&quot;, it will be a &quot;tree&quot; of objects.
 For example:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> parseFilter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>).parseFilter;
+<pre><code class="language-js"><span class="hljs-keyword">const</span> parseFilter = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>).<span class="hljs-property">parseFilter</span>;
 
-<span class="hljs-keyword">const</span> f = parseFilter(<span class="hljs-string">&#x27;(objectclass=*)&#x27;</span>);
+<span class="hljs-keyword">const</span> f = <span class="hljs-title function_">parseFilter</span>(<span class="hljs-string">&#x27;(objectclass=*)&#x27;</span>);
 </code></pre>
 <p>Is a &quot;simple&quot; filter, and would just return a <code>PresenceFilter</code> object. However,</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = parseFilter(<span class="hljs-string">&#x27;(&amp;(employeeType=manager)(l=Seattle))&#x27;</span>);
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-title function_">parseFilter</span>(<span class="hljs-string">&#x27;(&amp;(employeeType=manager)(l=Seattle))&#x27;</span>);
 </code></pre>
 <p>Would return an <code>AndFilter</code>, which would have a <code>filters</code> array of two
 <code>EqualityFilter</code> objects.</p>
@@ -127,13 +127,13 @@ assertions.  This object will have an <code>attribute</code> and <code>value</co
 <p>The string syntax for an equality filter is <code>(attr=value)</code>.</p>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and a value matching <code>value</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> EqualityFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
   <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <p>Equality matching uses &quot;strict&quot; type JavaScript comparison, and by default
 everything in ldapjs (and LDAP) is a UTF-8 string.  If you want comparison
@@ -146,12 +146,12 @@ property will be <code>present</code>.</p>
 <p>The string syntax for a presence filter is <code>(attr=*)</code>.</p>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> PresenceFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PresenceFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="substringfilter">SubstringFilter</h1>
 <p>The substring filter is used to do wildcard matching of a string value. This
@@ -170,15 +170,15 @@ map to:</p>
 </code></pre>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and the &quot;regex&quot; matches the value</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> SubstringFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">SubstringFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
   <span class="hljs-attr">initial</span>: <span class="hljs-string">&#x27;foo&#x27;</span>,
   <span class="hljs-attr">any</span>: [<span class="hljs-string">&#x27;bar&#x27;</span>],
   <span class="hljs-attr">final</span>: <span class="hljs-string">&#x27;baz&#x27;</span>
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobigbardogbaz&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;fobigbardogbaz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobigbardogbaz&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;fobigbardogbaz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="greaterthanequalsfilter">GreaterThanEqualsFilter</h1>
 <p>The ge filter is used to do comparisons and ordering based on the value type. As
@@ -194,13 +194,13 @@ property and the <code>name</code> property will be <code>ge</code>.</p>
 </code></pre>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and the value is <code>&gt;=</code> this filter&#39;s <code>value</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> GreaterThanEqualsFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">GreaterThanEqualsFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
   <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>,
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;abc&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;abc&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="lessthanequalsfilter">LessThanEqualsFilter</h1>
 <p>The le filter is used to do comparisons and ordering based on the value type. As
@@ -216,13 +216,13 @@ Note that the ldapjs schema middleware will do this.</p>
 property and the <code>name</code> property will be <code>le</code>.</p>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and the value is <code>&lt;=</code> this filter&#39;s <code>value</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> LessThanEqualsFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LessThanEqualsFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
   <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>,
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;abc&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;abc&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foobar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="andfilter">AndFilter</h1>
 <p>The and filter is a complex filter that simply contains &quot;child&quot; filters. The
@@ -234,21 +234,21 @@ equality filters):</p>
 </code></pre>
 <p>The <code>matches()</code> method will return true IFF the passed in object matches all
 the filters in the <code>filters</code> array.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> AndFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AndFilter</span>({
   <span class="hljs-attr">filters</span>: [
-    <span class="hljs-keyword">new</span> EqualityFilter({
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
       <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
       <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>
     }),
-    <span class="hljs-keyword">new</span> EqualityFilter({
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
       <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;sn&#x27;</span>,
       <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;bar&#x27;</span>
     })
   ]
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="orfilter">OrFilter</h1>
 <p>The or filter is a complex filter that simply contains &quot;child&quot; filters. The
@@ -260,21 +260,21 @@ equality filters):</p>
 </code></pre>
 <p>The <code>matches()</code> method will return true IFF the passed in object matches <em>any</em>
 of the filters in the <code>filters</code> array.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> OrFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">OrFilter</span>({
   <span class="hljs-attr">filters</span>: [
-    <span class="hljs-keyword">new</span> EqualityFilter({
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
       <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
       <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>
     }),
-    <span class="hljs-keyword">new</span> EqualityFilter({
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
       <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;sn&#x27;</span>,
       <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;bar&#x27;</span>
     })
   ]
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>, <span class="hljs-attr">sn</span>: <span class="hljs-string">&#x27;baz&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="notfilter">NotFilter</h1>
 <p>The not filter is a complex filter that contains a single &quot;child&quot; filter. The
@@ -286,15 +286,15 @@ equality filter):</p>
 </code></pre>
 <p>The <code>matches()</code> method will return true IFF the passed in object does not match
 the filter in the <code>filter</code> property.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> NotFilter({
-  <span class="hljs-attr">filter</span>: <span class="hljs-keyword">new</span> EqualityFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NotFilter</span>({
+  <span class="hljs-attr">filter</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">EqualityFilter</span>({
       <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
       <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>
     })
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 <h1 id="approximatefilter">ApproximateFilter</h1>
 <p>The approximate filter is used to check &quot;approximate&quot; matching of
@@ -306,13 +306,13 @@ is what ActiveDirectory does too).</p>
 <p>The string syntax for an equality filter is <code>(attr~=value)</code>.</p>
 <p>The <code>matches()</code> method will return true IFF the passed in object has a
 key matching <code>attribute</code> and a value exactly matching <code>value</code>.</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> ApproximateFilter({
+<pre><code class="language-js"><span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ApproximateFilter</span>({
   <span class="hljs-attr">attribute</span>: <span class="hljs-string">&#x27;cn&#x27;</span>,
   <span class="hljs-attr">value</span>: <span class="hljs-string">&#x27;foo&#x27;</span>
 });
 
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
-f.matches({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;foo&#x27;</span>});  =&gt; <span class="hljs-literal">true</span>
+f.<span class="hljs-title function_">matches</span>({<span class="hljs-attr">cn</span>: <span class="hljs-string">&#x27;bar&#x27;</span>});  =&gt; <span class="hljs-literal">false</span>
 </code></pre>
 
 </div><!-- end #content -->

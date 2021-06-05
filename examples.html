@@ -67,200 +67,200 @@ with ldapjs.</p>
 
 <span class="hljs-comment">///--- Shared handlers</span>
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">authorize</span>(<span class="hljs-params">req, res, next</span>) {
   <span class="hljs-comment">/* Any user may search after bind, only cn=root has full power */</span>
-  <span class="hljs-keyword">const</span> isSearch = (req <span class="hljs-keyword">instanceof</span> ldap.SearchRequest);
-  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>) &amp;&amp; !isSearch)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
+  <span class="hljs-keyword">const</span> isSearch = (req <span class="hljs-keyword">instanceof</span> ldap.<span class="hljs-property">SearchRequest</span>);
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">connection</span>.<span class="hljs-property">ldap</span>.<span class="hljs-property">bindDN</span>.<span class="hljs-title function_">equals</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>) &amp;&amp; !isSearch)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InsufficientAccessRightsError</span>());
 
-  <span class="hljs-keyword">return</span> next();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 }
 
 
 <span class="hljs-comment">///--- Globals</span>
 
-<span class="hljs-keyword">const</span> SUFFIX = <span class="hljs-string">&#x27;o=joyent&#x27;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SUFFIX</span> = <span class="hljs-string">&#x27;o=joyent&#x27;</span>;
 <span class="hljs-keyword">const</span> db = {};
-<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 
 
 
-server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
+server.<span class="hljs-title function_">bind</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.<span class="hljs-property">credentials</span> !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InvalidCredentialsError</span>());
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.add(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+server.<span class="hljs-title function_">add</span>(<span class="hljs-variable constant_">SUFFIX</span>, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
 
   <span class="hljs-keyword">if</span> (db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">EntryAlreadyExistsError</span>(dn));
 
-  db[dn] = req.toObject().attributes;
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  db[dn] = req.<span class="hljs-title function_">toObject</span>().<span class="hljs-property">attributes</span>;
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.bind(SUFFIX, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+server.<span class="hljs-title function_">bind</span>(<span class="hljs-variable constant_">SUFFIX</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
   <span class="hljs-keyword">if</span> (!db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(dn));
 
-  <span class="hljs-keyword">if</span> (!db[dn].userpassword)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(<span class="hljs-string">&#x27;userPassword&#x27;</span>));
+  <span class="hljs-keyword">if</span> (!db[dn].<span class="hljs-property">userpassword</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchAttributeError</span>(<span class="hljs-string">&#x27;userPassword&#x27;</span>));
 
-  <span class="hljs-keyword">if</span> (db[dn].userpassword.indexOf(req.credentials) === -<span class="hljs-number">1</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
+  <span class="hljs-keyword">if</span> (db[dn].<span class="hljs-property">userpassword</span>.<span class="hljs-title function_">indexOf</span>(req.<span class="hljs-property">credentials</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InvalidCredentialsError</span>());
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.compare(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+server.<span class="hljs-title function_">compare</span>(<span class="hljs-variable constant_">SUFFIX</span>, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
   <span class="hljs-keyword">if</span> (!db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(dn));
 
-  <span class="hljs-keyword">if</span> (!db[dn][req.attribute])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(req.attribute));
+  <span class="hljs-keyword">if</span> (!db[dn][req.<span class="hljs-property">attribute</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchAttributeError</span>(req.<span class="hljs-property">attribute</span>));
 
   <span class="hljs-keyword">const</span> matches = <span class="hljs-literal">false</span>;
-  <span class="hljs-keyword">const</span> vals = db[dn][req.attribute];
+  <span class="hljs-keyword">const</span> vals = db[dn][req.<span class="hljs-property">attribute</span>];
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> value <span class="hljs-keyword">of</span> vals) {
-    <span class="hljs-keyword">if</span> (value === req.value) {
+    <span class="hljs-keyword">if</span> (value === req.<span class="hljs-property">value</span>) {
       matches = <span class="hljs-literal">true</span>;
       <span class="hljs-keyword">break</span>;
     }
   }
 
-  res.end(matches);
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>(matches);
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.del(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+server.<span class="hljs-title function_">del</span>(<span class="hljs-variable constant_">SUFFIX</span>, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
   <span class="hljs-keyword">if</span> (!db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(dn));
 
   <span class="hljs-keyword">delete</span> db[dn];
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.modify(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
-  <span class="hljs-keyword">if</span> (!req.changes.length)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
+server.<span class="hljs-title function_">modify</span>(<span class="hljs-variable constant_">SUFFIX</span>, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">changes</span>.<span class="hljs-property">length</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ProtocolError</span>(<span class="hljs-string">&#x27;changes required&#x27;</span>));
   <span class="hljs-keyword">if</span> (!db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(dn));
 
   <span class="hljs-keyword">const</span> entry = db[dn];
 
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.changes) {
-    mod = change.modification;
-    <span class="hljs-keyword">switch</span> (change.operation) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.<span class="hljs-property">changes</span>) {
+    mod = change.<span class="hljs-property">modification</span>;
+    <span class="hljs-keyword">switch</span> (change.<span class="hljs-property">operation</span>) {
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
-      <span class="hljs-keyword">if</span> (!entry[mod.type])
-        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(mod.type));
+      <span class="hljs-keyword">if</span> (!entry[mod.<span class="hljs-property">type</span>])
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchAttributeError</span>(mod.<span class="hljs-property">type</span>));
 
-      <span class="hljs-keyword">if</span> (!mod.vals || !mod.vals.length) {
-        <span class="hljs-keyword">delete</span> entry[mod.type];
+      <span class="hljs-keyword">if</span> (!mod.<span class="hljs-property">vals</span> || !mod.<span class="hljs-property">vals</span>.<span class="hljs-property">length</span>) {
+        <span class="hljs-keyword">delete</span> entry[mod.<span class="hljs-property">type</span>];
       } <span class="hljs-keyword">else</span> {
-        entry[mod.type] = mod.vals;
+        entry[mod.<span class="hljs-property">type</span>] = mod.<span class="hljs-property">vals</span>;
       }
 
       <span class="hljs-keyword">break</span>;
 
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
-      <span class="hljs-keyword">if</span> (!entry[mod.type]) {
-        entry[mod.type] = mod.vals;
+      <span class="hljs-keyword">if</span> (!entry[mod.<span class="hljs-property">type</span>]) {
+        entry[mod.<span class="hljs-property">type</span>] = mod.<span class="hljs-property">vals</span>;
       } <span class="hljs-keyword">else</span> {
-        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> v <span class="hljs-keyword">of</span> mod.vals) {
-          <span class="hljs-keyword">if</span> (entry[mod.type].indexOf(v) === -<span class="hljs-number">1</span>)
-            entry[mod.type].push(v);
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> v <span class="hljs-keyword">of</span> mod.<span class="hljs-property">vals</span>) {
+          <span class="hljs-keyword">if</span> (entry[mod.<span class="hljs-property">type</span>].<span class="hljs-title function_">indexOf</span>(v) === -<span class="hljs-number">1</span>)
+            entry[mod.<span class="hljs-property">type</span>].<span class="hljs-title function_">push</span>(v);
         }
       }
 
       <span class="hljs-keyword">break</span>;
 
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
-      <span class="hljs-keyword">if</span> (!entry[mod.type])
-        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchAttributeError(mod.type));
+      <span class="hljs-keyword">if</span> (!entry[mod.<span class="hljs-property">type</span>])
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchAttributeError</span>(mod.<span class="hljs-property">type</span>));
 
-      <span class="hljs-keyword">delete</span> entry[mod.type];
+      <span class="hljs-keyword">delete</span> entry[mod.<span class="hljs-property">type</span>];
 
       <span class="hljs-keyword">break</span>;
     }
   }
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
-server.search(SUFFIX, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> dn = req.dn.toString();
+server.<span class="hljs-title function_">search</span>(<span class="hljs-variable constant_">SUFFIX</span>, authorize, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> dn = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
   <span class="hljs-keyword">if</span> (!db[dn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(dn));
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(dn));
 
   <span class="hljs-keyword">let</span> scopeCheck;
 
-  <span class="hljs-keyword">switch</span> (req.scope) {
+  <span class="hljs-keyword">switch</span> (req.<span class="hljs-property">scope</span>) {
   <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;base&#x27;</span>:
-    <span class="hljs-keyword">if</span> (req.filter.matches(db[dn])) {
-      res.send({
+    <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(db[dn])) {
+      res.<span class="hljs-title function_">send</span>({
         <span class="hljs-attr">dn</span>: dn,
         <span class="hljs-attr">attributes</span>: db[dn]
       });
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 
   <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;one&#x27;</span>:
     scopeCheck = <span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> {
-      <span class="hljs-keyword">if</span> (req.dn.equals(k))
+      <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">equals</span>(k))
         <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
 
-      <span class="hljs-keyword">const</span> parent = ldap.parseDN(k).parent();
-      <span class="hljs-keyword">return</span> (parent ? parent.equals(req.dn) : <span class="hljs-literal">false</span>);
+      <span class="hljs-keyword">const</span> parent = ldap.<span class="hljs-title function_">parseDN</span>(k).<span class="hljs-title function_">parent</span>();
+      <span class="hljs-keyword">return</span> (parent ? parent.<span class="hljs-title function_">equals</span>(req.<span class="hljs-property">dn</span>) : <span class="hljs-literal">false</span>);
     };
     <span class="hljs-keyword">break</span>;
 
   <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;sub&#x27;</span>:
     scopeCheck = <span class="hljs-function">(<span class="hljs-params">k</span>) =&gt;</span> {
-      <span class="hljs-keyword">return</span> (req.dn.equals(k) || req.dn.parentOf(k));
+      <span class="hljs-keyword">return</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">equals</span>(k) || req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">parentOf</span>(k));
     };
 
     <span class="hljs-keyword">break</span>;
   }
 
-  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(db);
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">keys</span>(db);
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> key <span class="hljs-keyword">of</span> keys) {
-    <span class="hljs-keyword">if</span> (!scopeCheck(key))
+    <span class="hljs-keyword">if</span> (!<span class="hljs-title function_">scopeCheck</span>(key))
       <span class="hljs-keyword">return</span>;
 
-    <span class="hljs-keyword">if</span> (req.filter.matches(db[key])) {
-      res.send({
+    <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(db[key])) {
+      res.<span class="hljs-title function_">send</span>({
         <span class="hljs-attr">dn</span>: key,
         <span class="hljs-attr">attributes</span>: db[key]
       });
     }
   }
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
 
 
 <span class="hljs-comment">///--- Fire it up</span>
 
-server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;LDAP server up at: %s&#x27;</span>, server.url);
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;LDAP server up at: %s&#x27;</span>, server.<span class="hljs-property">url</span>);
 });
 </code></pre>
 <h1 id="etcpasswd-server">/etc/passwd server</h1>
@@ -272,31 +272,31 @@ server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function"
 
 <span class="hljs-comment">///--- Shared handlers</span>
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">authorize</span>(<span class="hljs-params">req, res, next</span>) {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">connection</span>.<span class="hljs-property">ldap</span>.<span class="hljs-property">bindDN</span>.<span class="hljs-title function_">equals</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InsufficientAccessRightsError</span>());
 
-  <span class="hljs-keyword">return</span> next();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 }
 
 
-<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  fs.readFile(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">loadPasswdFile</span>(<span class="hljs-params">req, res, next</span>) {
+  fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">&#x27;/etc/passwd&#x27;</span>, <span class="hljs-string">&#x27;utf8&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, data</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (err)
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(err.message));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(err.<span class="hljs-property">message</span>));
 
-    req.users = {};
+    req.<span class="hljs-property">users</span> = {};
 
-    <span class="hljs-keyword">const</span> lines = data.split(<span class="hljs-string">&#x27;\n&#x27;</span>);
+    <span class="hljs-keyword">const</span> lines = data.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;\n&#x27;</span>);
     <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> lines) {
-      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.test(line))
+      <span class="hljs-keyword">if</span> (!line || <span class="hljs-regexp">/^#/</span>.<span class="hljs-title function_">test</span>(line))
         <span class="hljs-keyword">continue</span>;
 
-      <span class="hljs-keyword">const</span> record = line.split(<span class="hljs-string">&#x27;:&#x27;</span>);
-      <span class="hljs-keyword">if</span> (!record || !record.length)
+      <span class="hljs-keyword">const</span> record = line.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;:&#x27;</span>);
+      <span class="hljs-keyword">if</span> (!record || !record.<span class="hljs-property">length</span>)
         <span class="hljs-keyword">continue</span>;
 
-      req.users[record[<span class="hljs-number">0</span>]] = {
+      req.<span class="hljs-property">users</span>[record[<span class="hljs-number">0</span>]] = {
         <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;cn=&#x27;</span> + record[<span class="hljs-number">0</span>] + <span class="hljs-string">&#x27;, ou=users, o=myhost&#x27;</span>,
         <span class="hljs-attr">attributes</span>: {
           <span class="hljs-attr">cn</span>: record[<span class="hljs-number">0</span>],
@@ -310,7 +310,7 @@ server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function"
       };
     }
 
-    <span class="hljs-keyword">return</span> next();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 }
 
@@ -321,157 +321,157 @@ server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function"
 
 <span class="hljs-comment">///--- Mainline</span>
 
-<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 
-server.bind(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (req.dn.toString() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.credentials !== <span class="hljs-string">&#x27;secret&#x27;</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
+server.<span class="hljs-title function_">bind</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>() !== <span class="hljs-string">&#x27;cn=root&#x27;</span> || req.<span class="hljs-property">credentials</span> !== <span class="hljs-string">&#x27;secret&#x27;</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InvalidCredentialsError</span>());
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
 
-server.add(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;cn required&#x27;</span>));
+server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;cn required&#x27;</span>));
 
-  <span class="hljs-keyword">if</span> (req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.EntryAlreadyExistsError(req.dn.toString()));
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">EntryAlreadyExistsError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">const</span> entry = req.toObject().attributes;
+  <span class="hljs-keyword">const</span> entry = req.<span class="hljs-title function_">toObject</span>().<span class="hljs-property">attributes</span>;
 
-  <span class="hljs-keyword">if</span> (entry.objectclass.indexOf(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ConstraintViolationError(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">objectclass</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&#x27;unixUser&#x27;</span>) === -<span class="hljs-number">1</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ConstraintViolationError</span>(<span class="hljs-string">&#x27;entry must be a unixUser&#x27;</span>));
 
   <span class="hljs-keyword">const</span> opts = [<span class="hljs-string">&#x27;-m&#x27;</span>];
-  <span class="hljs-keyword">if</span> (entry.description) {
-    opts.push(<span class="hljs-string">&#x27;-c&#x27;</span>);
-    opts.push(entry.description[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">description</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-c&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">description</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.homedirectory) {
-    opts.push(<span class="hljs-string">&#x27;-d&#x27;</span>);
-    opts.push(entry.homedirectory[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">homedirectory</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-d&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">homedirectory</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.gid) {
-    opts.push(<span class="hljs-string">&#x27;-g&#x27;</span>);
-    opts.push(entry.gid[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">gid</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-g&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">gid</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.shell) {
-    opts.push(<span class="hljs-string">&#x27;-s&#x27;</span>);
-    opts.push(entry.shell[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">shell</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-s&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">shell</span>[<span class="hljs-number">0</span>]);
   }
-  <span class="hljs-keyword">if</span> (entry.uid) {
-    opts.push(<span class="hljs-string">&#x27;-u&#x27;</span>);
-    opts.push(entry.uid[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">if</span> (entry.<span class="hljs-property">uid</span>) {
+    opts.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;-u&#x27;</span>);
+    opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">uid</span>[<span class="hljs-number">0</span>]);
   }
-  opts.push(entry.cn[<span class="hljs-number">0</span>]);
-  <span class="hljs-keyword">const</span> useradd = spawn(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
+  opts.<span class="hljs-title function_">push</span>(entry.<span class="hljs-property">cn</span>[<span class="hljs-number">0</span>]);
+  <span class="hljs-keyword">const</span> useradd = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;useradd&#x27;</span>, opts);
 
   <span class="hljs-keyword">const</span> messages = [];
 
-  useradd.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  useradd.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
-  useradd.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  useradd.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
 
-  useradd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  useradd.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
       <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
-      <span class="hljs-keyword">if</span> (messages.length)
-        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
+      <span class="hljs-keyword">if</span> (messages.<span class="hljs-property">length</span>)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.<span class="hljs-title function_">join</span>();
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(msg));
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 
 
-server.modify(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
+server.<span class="hljs-title function_">modify</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span> || !req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">if</span> (!req.changes.length)
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.ProtocolError(<span class="hljs-string">&#x27;changes required&#x27;</span>));
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">changes</span>.<span class="hljs-property">length</span>)
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">ProtocolError</span>(<span class="hljs-string">&#x27;changes required&#x27;</span>));
 
-  <span class="hljs-keyword">const</span> user = req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn].attributes;
+  <span class="hljs-keyword">const</span> user = req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>].<span class="hljs-property">attributes</span>;
   <span class="hljs-keyword">let</span> mod;
 
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.changes) {
-    mod = change.modification;
-    <span class="hljs-keyword">switch</span> (change.operation) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> change <span class="hljs-keyword">of</span> req.<span class="hljs-property">changes</span>) {
+    mod = change.<span class="hljs-property">modification</span>;
+    <span class="hljs-keyword">switch</span> (change.<span class="hljs-property">operation</span>) {
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;replace&#x27;</span>:
-      <span class="hljs-keyword">if</span> (mod.type !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.vals || !mod.vals.length)
-        <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
+      <span class="hljs-keyword">if</span> (mod.<span class="hljs-property">type</span> !== <span class="hljs-string">&#x27;userpassword&#x27;</span> || !mod.<span class="hljs-property">vals</span> || !mod.<span class="hljs-property">vals</span>.<span class="hljs-property">length</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">UnwillingToPerformError</span>(<span class="hljs-string">&#x27;only password updates &#x27;</span> +
                                                      <span class="hljs-string">&#x27;allowed&#x27;</span>));
       <span class="hljs-keyword">break</span>;
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;add&#x27;</span>:
     <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;delete&#x27;</span>:
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.UnwillingToPerformError(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">UnwillingToPerformError</span>(<span class="hljs-string">&#x27;only replace allowed&#x27;</span>));
     }
   }
 
-  <span class="hljs-keyword">const</span> passwd = spawn(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
-  passwd.stdin.end(user.cn + <span class="hljs-string">&#x27;:&#x27;</span> + mod.vals[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
+  <span class="hljs-keyword">const</span> passwd = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;chpasswd&#x27;</span>, [<span class="hljs-string">&#x27;-c&#x27;</span>, <span class="hljs-string">&#x27;MD5&#x27;</span>]);
+  passwd.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">end</span>(user.<span class="hljs-property">cn</span> + <span class="hljs-string">&#x27;:&#x27;</span> + mod.<span class="hljs-property">vals</span>[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;utf8&#x27;</span>);
 
-  passwd.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  passwd.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(<span class="hljs-string">&#x27;&#x27;</span> + code));
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(<span class="hljs-string">&#x27;&#x27;</span> + code));
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 
 
-server.del(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (!req.dn.rdns[<span class="hljs-number">0</span>].cn || !req.users[req.dn.rdns[<span class="hljs-number">0</span>].cn])
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.NoSuchObjectError(req.dn.toString()));
+server.<span class="hljs-title function_">del</span>(<span class="hljs-string">&#x27;ou=users, o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span> || !req.<span class="hljs-property">users</span>[req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>])
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">NoSuchObjectError</span>(req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>()));
 
-  <span class="hljs-keyword">const</span> userdel = spawn(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.dn.rdns[<span class="hljs-number">0</span>].cn]);
+  <span class="hljs-keyword">const</span> userdel = <span class="hljs-title function_">spawn</span>(<span class="hljs-string">&#x27;userdel&#x27;</span>, [<span class="hljs-string">&#x27;-f&#x27;</span>, req.<span class="hljs-property">dn</span>.<span class="hljs-property">rdns</span>[<span class="hljs-number">0</span>].<span class="hljs-property">cn</span>]);
 
   <span class="hljs-keyword">const</span> messages = [];
-  userdel.stdout.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  userdel.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
-  userdel.stderr.on(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
-    messages.push(data.toString());
+  userdel.<span class="hljs-property">stderr</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+    messages.<span class="hljs-title function_">push</span>(data.<span class="hljs-title function_">toString</span>());
   });
 
-  userdel.on(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
+  userdel.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;exit&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =&gt;</span> {
     <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
       <span class="hljs-keyword">let</span> msg = <span class="hljs-string">&#x27;&#x27;</span> + code;
-      <span class="hljs-keyword">if</span> (messages.length)
-        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.join();
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError(msg));
+      <span class="hljs-keyword">if</span> (messages.<span class="hljs-property">length</span>)
+        msg += <span class="hljs-string">&#x27;: &#x27;</span> + messages.<span class="hljs-title function_">join</span>();
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>(msg));
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 });
 
 
-server.search(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-keyword">const</span> keys = <span class="hljs-built_in">Object</span>.keys(req.users);
+server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=myhost&#x27;</span>, pre, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> keys = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">keys</span>(req.<span class="hljs-property">users</span>);
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> k <span class="hljs-keyword">of</span> keys) {
-    <span class="hljs-keyword">if</span> (req.filter.matches(req.users[k].attributes))
-      res.send(req.users[k]);
+    <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(req.<span class="hljs-property">users</span>[k].<span class="hljs-property">attributes</span>))
+      res.<span class="hljs-title function_">send</span>(req.<span class="hljs-property">users</span>[k]);
   }
 
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 
 
 
 <span class="hljs-comment">// LDAP &quot;standard&quot; listens on 389, but whatever.</span>
-server.listen(<span class="hljs-number">1389</span>, <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.url);
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">1389</span>, <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;/etc/passwd LDAP server up at: %s&#x27;</span>, server.<span class="hljs-property">url</span>);
 });
 </code></pre>
 <h1 id="address-book">Address Book</h1>
@@ -504,88 +504,88 @@ Thunderbird or Evolution over a MySQL database.</p>
 
 <span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 <span class="hljs-keyword">const</span> mysql = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;mysql&quot;</span>);
-<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 <span class="hljs-keyword">const</span> addrbooks = {};
 <span class="hljs-keyword">const</span> userinfo = {};
 <span class="hljs-keyword">const</span> ldap_port = <span class="hljs-number">389</span>;
 <span class="hljs-keyword">const</span> basedn = <span class="hljs-string">&quot;dc=example, dc=com&quot;</span>;
 <span class="hljs-keyword">const</span> company = <span class="hljs-string">&quot;Example&quot;</span>;
-<span class="hljs-keyword">const</span> db = mysql.createClient({
+<span class="hljs-keyword">const</span> db = mysql.<span class="hljs-title function_">createClient</span>({
   <span class="hljs-attr">user</span>: <span class="hljs-string">&quot;abook&quot;</span>,
   <span class="hljs-attr">password</span>: <span class="hljs-string">&quot;abook&quot;</span>,
   <span class="hljs-attr">database</span>: <span class="hljs-string">&quot;abook&quot;</span>
 });
 
-db.query(<span class="hljs-string">&quot;SELECT c.*,u.username,u.password &quot;</span> +
+db.<span class="hljs-title function_">query</span>(<span class="hljs-string">&quot;SELECT c.*,u.username,u.password &quot;</span> +
          <span class="hljs-string">&quot;FROM contacts c JOIN users u ON c.user_id=u.id&quot;</span>,
          <span class="hljs-function">(<span class="hljs-params">err, contacts</span>) =&gt;</span> {
   <span class="hljs-keyword">if</span> (err) {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Error fetching contacts&quot;</span>, err);
-    process.exit(<span class="hljs-number">1</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Error fetching contacts&quot;</span>, err);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);
   }
 
   <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> contact <span class="hljs-keyword">of</span> contacts) {
-    <span class="hljs-keyword">if</span> (!addrbooks.hasOwnProperty(contact.username)) {
-      addrbooks[contact.username] = [];
-      userinfo[<span class="hljs-string">&quot;cn=&quot;</span> + contact.username + <span class="hljs-string">&quot;, &quot;</span> + basedn] = {
-        <span class="hljs-attr">abook</span>: addrbooks[contact.username],
-        <span class="hljs-attr">pwd</span>: contact.password
+    <span class="hljs-keyword">if</span> (!addrbooks.<span class="hljs-title function_">hasOwnProperty</span>(contact.<span class="hljs-property">username</span>)) {
+      addrbooks[contact.<span class="hljs-property">username</span>] = [];
+      userinfo[<span class="hljs-string">&quot;cn=&quot;</span> + contact.<span class="hljs-property">username</span> + <span class="hljs-string">&quot;, &quot;</span> + basedn] = {
+        <span class="hljs-attr">abook</span>: addrbooks[contact.<span class="hljs-property">username</span>],
+        <span class="hljs-attr">pwd</span>: contact.<span class="hljs-property">password</span>
       };
     }
 
-    <span class="hljs-keyword">const</span> p = contact.name.indexOf(<span class="hljs-string">&quot; &quot;</span>);
+    <span class="hljs-keyword">const</span> p = contact.<span class="hljs-property">name</span>.<span class="hljs-title function_">indexOf</span>(<span class="hljs-string">&quot; &quot;</span>);
     <span class="hljs-keyword">if</span> (p != -<span class="hljs-number">1</span>)
-      contact.firstname = contact.name.substr(<span class="hljs-number">0</span>, p);
+      contact.<span class="hljs-property">firstname</span> = contact.<span class="hljs-property">name</span>.<span class="hljs-title function_">substr</span>(<span class="hljs-number">0</span>, p);
 
-    p = contact.name.lastIndexOf(<span class="hljs-string">&quot; &quot;</span>);
+    p = contact.<span class="hljs-property">name</span>.<span class="hljs-title function_">lastIndexOf</span>(<span class="hljs-string">&quot; &quot;</span>);
     <span class="hljs-keyword">if</span> (p != -<span class="hljs-number">1</span>)
-      contact.surname = contact.name.substr(p + <span class="hljs-number">1</span>);
+      contact.<span class="hljs-property">surname</span> = contact.<span class="hljs-property">name</span>.<span class="hljs-title function_">substr</span>(p + <span class="hljs-number">1</span>);
 
-    addrbooks[contact.username].push({
-      <span class="hljs-attr">dn</span>: <span class="hljs-string">&quot;cn=&quot;</span> + contact.name + <span class="hljs-string">&quot;, &quot;</span> + basedn,
+    addrbooks[contact.<span class="hljs-property">username</span>].<span class="hljs-title function_">push</span>({
+      <span class="hljs-attr">dn</span>: <span class="hljs-string">&quot;cn=&quot;</span> + contact.<span class="hljs-property">name</span> + <span class="hljs-string">&quot;, &quot;</span> + basedn,
       <span class="hljs-attr">attributes</span>: {
         <span class="hljs-attr">objectclass</span>: [ <span class="hljs-string">&quot;top&quot;</span> ],
-        <span class="hljs-attr">cn</span>: contact.name,
-        <span class="hljs-attr">mail</span>: contact.email,
-        <span class="hljs-attr">givenname</span>: contact.firstname,
-        <span class="hljs-attr">sn</span>: contact.surname,
+        <span class="hljs-attr">cn</span>: contact.<span class="hljs-property">name</span>,
+        <span class="hljs-attr">mail</span>: contact.<span class="hljs-property">email</span>,
+        <span class="hljs-attr">givenname</span>: contact.<span class="hljs-property">firstname</span>,
+        <span class="hljs-attr">sn</span>: contact.<span class="hljs-property">surname</span>,
         <span class="hljs-attr">ou</span>: company
       }
     });
   }
 
-  server.bind(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-    <span class="hljs-keyword">const</span> username = req.dn.toString();
-    <span class="hljs-keyword">const</span> password = req.credentials;
+  server.<span class="hljs-title function_">bind</span>(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> username = req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>();
+    <span class="hljs-keyword">const</span> password = req.<span class="hljs-property">credentials</span>;
 
-    <span class="hljs-keyword">if</span> (!userinfo.hasOwnProperty(username) ||
-         userinfo[username].pwd != password) {
-      <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InvalidCredentialsError());
+    <span class="hljs-keyword">if</span> (!userinfo.<span class="hljs-title function_">hasOwnProperty</span>(username) ||
+         userinfo[username].<span class="hljs-property">pwd</span> != password) {
+      <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InvalidCredentialsError</span>());
     }
 
-    res.end();
-    <span class="hljs-keyword">return</span> next();
+    res.<span class="hljs-title function_">end</span>();
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
   });
 
-  server.search(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-    <span class="hljs-keyword">const</span> binddn = req.connection.ldap.bindDN.toString();
+  server.<span class="hljs-title function_">search</span>(basedn, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> binddn = req.<span class="hljs-property">connection</span>.<span class="hljs-property">ldap</span>.<span class="hljs-property">bindDN</span>.<span class="hljs-title function_">toString</span>();
 
-    <span class="hljs-keyword">if</span> (userinfo.hasOwnProperty(binddn)) {
-      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> abook <span class="hljs-keyword">of</span> userinfo[binddn].abook) {
-        <span class="hljs-keyword">if</span> (req.filter.matches(abook.attributes))
-          res.send(abook);
+    <span class="hljs-keyword">if</span> (userinfo.<span class="hljs-title function_">hasOwnProperty</span>(binddn)) {
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> abook <span class="hljs-keyword">of</span> userinfo[binddn].<span class="hljs-property">abook</span>) {
+        <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(abook.<span class="hljs-property">attributes</span>))
+          res.<span class="hljs-title function_">send</span>(abook);
       }
     }
-    res.end();
+    res.<span class="hljs-title function_">end</span>();
   });
 
-  server.listen(ldap_port, <span class="hljs-function">() =&gt;</span> {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&quot;Addressbook started at %s&quot;</span>, server.url);
+  server.<span class="hljs-title function_">listen</span>(ldap_port, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Addressbook started at %s&quot;</span>, server.<span class="hljs-property">url</span>);
   });
 });
 </code></pre>
 <p>To test out this example, try:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:389 -x -D cn=demo,dc=example,dc=com \
   -w demo -b <span class="hljs-string">&quot;dc=example,dc=com&quot;</span> objectclass=*</span>
 </code></pre>
 <h1 id="multi-threaded-server">Multi-threaded Server</h1>
@@ -596,64 +596,64 @@ db.query(<span class="hljs-string">&quot;SELECT c.*,u.username,u.password &quot;
 <span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;os&#x27;</span>);
 
 <span class="hljs-keyword">const</span> threads = [];
-threads.getNext = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">Math</span>.floor(<span class="hljs-built_in">Math</span>.random() * <span class="hljs-built_in">this</span>.length));
+threads.<span class="hljs-property">getNext</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">return</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() * <span class="hljs-variable language_">this</span>.<span class="hljs-property">length</span>));
 };
 
 <span class="hljs-keyword">const</span> serverOptions = {
     <span class="hljs-attr">port</span>: <span class="hljs-number">1389</span>
 };
 
-<span class="hljs-keyword">if</span> (cluster.isMaster) {
-    <span class="hljs-keyword">const</span> server = net.createServer(serverOptions, <span class="hljs-function">(<span class="hljs-params">socket</span>) =&gt;</span> {
-        socket.pause();
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;ldapjs client requesting connection&#x27;</span>);
-        <span class="hljs-keyword">let</span> routeTo = threads.getNext();
-        threads[routeTo].send({ <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;connection&#x27;</span> }, socket);
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isMaster</span>) {
+    <span class="hljs-keyword">const</span> server = net.<span class="hljs-title function_">createServer</span>(serverOptions, <span class="hljs-function">(<span class="hljs-params">socket</span>) =&gt;</span> {
+        socket.<span class="hljs-title function_">pause</span>();
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ldapjs client requesting connection&#x27;</span>);
+        <span class="hljs-keyword">let</span> routeTo = threads.<span class="hljs-title function_">getNext</span>();
+        threads[routeTo].<span class="hljs-title function_">send</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;connection&#x27;</span> }, socket);
     });
 
-    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; os.cpus().length; i++) {
-        <span class="hljs-keyword">let</span> thread = cluster.fork({
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; os.<span class="hljs-title function_">cpus</span>().<span class="hljs-property">length</span>; i++) {
+        <span class="hljs-keyword">let</span> thread = cluster.<span class="hljs-title function_">fork</span>({
             <span class="hljs-string">&#x27;id&#x27;</span>: i
         });
-        thread.id = i;
-        thread.on(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">msg</span>) </span>{
+        thread.<span class="hljs-property">id</span> = i;
+        thread.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">msg</span>) {
 
         });
-        threads.push(thread);
+        threads.<span class="hljs-title function_">push</span>(thread);
     }
 
-    server.listen(serverOptions.port, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;ldapjs listening at ldap://127.0.0.1:&#x27;</span> + serverOptions.port);
+    server.<span class="hljs-title function_">listen</span>(serverOptions.<span class="hljs-property">port</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ldapjs listening at ldap://127.0.0.1:&#x27;</span> + serverOptions.<span class="hljs-property">port</span>);
     });
 } <span class="hljs-keyword">else</span> {
-    <span class="hljs-keyword">const</span> server = ldap.createServer(serverOptions);
+    <span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>(serverOptions);
 
-    <span class="hljs-keyword">let</span> threadId = process.env.id;
+    <span class="hljs-keyword">let</span> threadId = process.<span class="hljs-property">env</span>.<span class="hljs-property">id</span>;
 
-    process.on(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">msg, socket</span>) =&gt;</span> {
-        <span class="hljs-keyword">switch</span> (msg.type) {
+    process.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;message&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">msg, socket</span>) =&gt;</span> {
+        <span class="hljs-keyword">switch</span> (msg.<span class="hljs-property">type</span>) {
             <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;connection&#x27;</span>:
-                server.newConnection(socket);
-                socket.resume();
-                <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;ldapjs client connection accepted on &#x27;</span> + threadId.toString());
+                server.<span class="hljs-title function_">newConnection</span>(socket);
+                socket.<span class="hljs-title function_">resume</span>();
+                <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ldapjs client connection accepted on &#x27;</span> + threadId.<span class="hljs-title function_">toString</span>());
         }
     });
 
-    server.search(<span class="hljs-string">&#x27;dc=example&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">req, res, next</span>) </span>{
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;ldapjs search initiated on &#x27;</span> + threadId.toString());
+    server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;dc=example&#x27;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">req, res, next</span>) {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;ldapjs search initiated on &#x27;</span> + threadId.<span class="hljs-title function_">toString</span>());
         <span class="hljs-keyword">var</span> obj = {
-            <span class="hljs-attr">dn</span>: req.dn.toString(),
+            <span class="hljs-attr">dn</span>: req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>(),
             <span class="hljs-attr">attributes</span>: {
                 <span class="hljs-attr">objectclass</span>: [<span class="hljs-string">&#x27;organization&#x27;</span>, <span class="hljs-string">&#x27;top&#x27;</span>],
                 <span class="hljs-attr">o</span>: <span class="hljs-string">&#x27;example&#x27;</span>
             }
         };
 
-        <span class="hljs-keyword">if</span> (req.filter.matches(obj.attributes))
-            res.send(obj);
+        <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(obj.<span class="hljs-property">attributes</span>))
+            res.<span class="hljs-title function_">send</span>(obj);
 
-        res.end();
+        res.<span class="hljs-title function_">end</span>();
     });
 }
 </code></pre>

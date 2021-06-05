@@ -233,7 +233,7 @@ with LDAP. If you&#39;re not, read the <a href="guide.html">guide</a> first.</p>
 
 <h1 id="create-a-server">Create a server</h1>
 <p>The code to create a new server looks like:</p>
-<pre><code class="language-js"><span class="hljs-keyword">const</span> server = ldap.createServer();
+<pre><code class="language-js"><span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 </code></pre>
 <p>The full list of options is:</p>
 <p>||log||You can optionally pass in a Bunyan compatible logger instance the client will use to acquire a child logger.||
@@ -269,8 +269,8 @@ APIs.</p>
 <p>After calling <code>listen</code>, the property <code>url</code> on the server object itself will be
 available.</p>
 <p>Example:</p>
-<pre><code class="language-js"> server.listen(<span class="hljs-number">389</span>, <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
-   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;LDAP server listening at: &#x27;</span> + server.url);
+<pre><code class="language-js"> server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">389</span>, <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;LDAP server listening at: &#x27;</span> + server.<span class="hljs-property">url</span>);
  });
 </code></pre>
 <h3 id="port-and-host">Port and Host</h3>
@@ -301,14 +301,14 @@ paradigm of programming.  Essentially every method is of the form
 <code>OP(req, res, next)</code> where OP is one of bind, add, del, etc.  You can chain
 handlers together by calling <code>next()</code> and ordering your functions in the
 definition of the route.  For example:</p>
-<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">authorize</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  <span class="hljs-keyword">if</span> (!req.connection.ldap.bindDN.equals(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
-    <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.InsufficientAccessRightsError());
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">authorize</span>(<span class="hljs-params">req, res, next</span>) {
+  <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">connection</span>.<span class="hljs-property">ldap</span>.<span class="hljs-property">bindDN</span>.<span class="hljs-title function_">equals</span>(<span class="hljs-string">&#x27;cn=root&#x27;</span>))
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">InsufficientAccessRightsError</span>());
 
-  <span class="hljs-keyword">return</span> next();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 }
 
-server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, authorize, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, next</span>) </span>{ ... });
+server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, authorize, <span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, next</span>) { ... });
 </code></pre>
 <p>Note that ldapjs is also slightly different, since it&#39;s often going to be backed
 to a DB-like entity, in that it also has an API where you can pass in a
@@ -321,8 +321,8 @@ looks like:</p>
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 <span class="hljs-keyword">const</span> ldapRiak = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs-riak&#x27;</span>);
 
-<span class="hljs-keyword">const</span> server = ldap.createServer();
-<span class="hljs-keyword">const</span> backend = ldapRiak.createBackend({
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
+<span class="hljs-keyword">const</span> backend = ldapRiak.<span class="hljs-title function_">createBackend</span>({
   <span class="hljs-string">&quot;host&quot;</span>: <span class="hljs-string">&quot;localhost&quot;</span>,
   <span class="hljs-string">&quot;port&quot;</span>: <span class="hljs-number">8098</span>,
   <span class="hljs-string">&quot;bucket&quot;</span>: <span class="hljs-string">&quot;example&quot;</span>,
@@ -331,9 +331,9 @@ looks like:</p>
   <span class="hljs-string">&quot;numConnections&quot;</span>: <span class="hljs-number">5</span>
 });
 
-server.add(<span class="hljs-string">&quot;o=example&quot;</span>,
+server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&quot;o=example&quot;</span>,
            backend,
-           backend.add());
+           backend.<span class="hljs-title function_">add</span>());
 ...
 </code></pre>
 <p>The first parameter to an ldapjs route is always the point in the
@@ -345,9 +345,9 @@ signature (ldapjs will unroll them).</p>
 operation requires specific methods/fields on the request/response
 objects.  However, there is a <code>.use()</code> method availabe, similar to
 that on express/connect, allowing you to chain up &quot;middleware&quot;:</p>
-<pre><code class="language-js">server.use(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, next</span>) </span>{
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;hello world&#x27;</span>);
-  <span class="hljs-keyword">return</span> next();
+<pre><code class="language-js">server.<span class="hljs-title function_">use</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, next</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;hello world&#x27;</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 </code></pre>
 <h2 id="common-request-elements">Common Request Elements</h2>
@@ -382,19 +382,19 @@ of error codes.  The complete list is documented in <a href="errors.html">errors
 the paradigm is something defined like CONSTRAINT_VIOLATION in the RFC would be
 <code>ConstraintViolationError</code> in ldapjs.  Upon calling <code>next(new LDAPError())</code>,
 ldapjs will <em>stop</em> calling your handler chain.  For example:</p>
-<pre><code class="language-js">server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>,
-  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { <span class="hljs-keyword">return</span> next(); },
-  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { <span class="hljs-keyword">return</span> next(<span class="hljs-keyword">new</span> ldap.OperationsError()); },
-  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { res.end(); }
+<pre><code class="language-js">server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>,
+  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(); },
+  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">OperationsError</span>()); },
+  <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> { res.<span class="hljs-title function_">end</span>(); }
 );
 </code></pre>
 <p>In the code snipped above, the third handler would never get invoked.</p>
 <h1 id="bind">Bind</h1>
 <p>Adds a mount in the tree to perform LDAP binds with. Example:</p>
-<pre><code class="language-js">server.bind(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;bind DN: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;bind PW: &#x27;</span> + req.credentials);
-  res.end();
+<pre><code class="language-js">server.<span class="hljs-title function_">bind</span>(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;bind DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;bind PW: &#x27;</span> + req.<span class="hljs-property">credentials</span>);
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="bindrequest">BindRequest</h2>
@@ -414,10 +414,10 @@ will be the plain-text password.</p>
 <p>No extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="add">Add</h1>
 <p>Adds a mount in the tree to perform LDAP adds with.</p>
-<pre><code class="language-js">server.add(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;Entry attributes: &#x27;</span> + req.toObject().attributes);
-  res.end();
+<pre><code class="language-js">server.<span class="hljs-title function_">add</span>(<span class="hljs-string">&#x27;ou=people, o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Entry attributes: &#x27;</span> + req.<span class="hljs-title function_">toObject</span>().<span class="hljs-property">attributes</span>);
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="addrequest">AddRequest</h2>
@@ -447,11 +447,11 @@ like:</p>
 <p>No extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="search">Search</h1>
 <p>Adds a handler for the LDAP search operation.</p>
-<pre><code class="language-js">server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;base object: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;scope: &#x27;</span> + req.scope);
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;filter: &#x27;</span> + req.filter.toString());
-  res.end();
+<pre><code class="language-js">server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;base object: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;scope: &#x27;</span> + req.<span class="hljs-property">scope</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;filter: &#x27;</span> + req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">toString</span>());
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="searchrequest">SearchRequest</h2>
@@ -489,7 +489,7 @@ will automatically handle this for you.</p>
 <p>Allows you to send a <code>SearchEntry</code> object.  You do not need to
 explicitly pass in a <code>SearchEntry</code> object, and can instead just send a plain
 JavaScript object that matches the format used from <code>AddRequest.toObject()</code>.</p>
-<pre><code class="language-js">server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+<pre><code class="language-js">server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
   <span class="hljs-keyword">const</span> obj = {
     <span class="hljs-attr">dn</span>: <span class="hljs-string">&#x27;o=example&#x27;</span>,
     <span class="hljs-attr">attributes</span>: {
@@ -498,22 +498,22 @@ JavaScript object that matches the format used from <code>AddRequest.toObject()<
     }
   };
 
-  <span class="hljs-keyword">if</span> (req.filter.matches(obj))
-    res.send(obj)
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(obj))
+    res.<span class="hljs-title function_">send</span>(obj)
 
-  res.end();
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h1 id="modify">modify</h1>
 <p>Allows you to handle an LDAP modify operation.</p>
-<pre><code class="language-js">server.modify(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;changes:&#x27;</span>);
-  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> c <span class="hljs-keyword">of</span> req.changes) {
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;  operation: &#x27;</span> + c.operation);
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;  modification: &#x27;</span> + c.modification.toString());
+<pre><code class="language-js">server.<span class="hljs-title function_">modify</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;changes:&#x27;</span>);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> c <span class="hljs-keyword">of</span> req.<span class="hljs-property">changes</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;  operation: &#x27;</span> + c.<span class="hljs-property">operation</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;  modification: &#x27;</span> + c.<span class="hljs-property">modification</span>.<span class="hljs-title function_">toString</span>());
   }
-  res.end();
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="modifyrequest">ModifyRequest</h2>
@@ -535,9 +535,9 @@ details on the <code>Change</code> object.</p>
 <p>No extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="del">del</h1>
 <p>Allows you to handle an LDAP delete operation.</p>
-<pre><code class="language-js">server.del(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.dn.toString());
-  res.end();
+<pre><code class="language-js">server.<span class="hljs-title function_">del</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="deleterequest">DeleteRequest</h2>
@@ -548,11 +548,11 @@ property).</p>
 <p>No extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="compare">compare</h1>
 <p>Allows you to handle an LDAP compare operation.</p>
-<pre><code class="language-js">server.compare(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;attribute name: &#x27;</span> + req.attribute);
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;attribute value: &#x27;</span> + req.value);
-  res.end(req.value === <span class="hljs-string">&#x27;foo&#x27;</span>);
+<pre><code class="language-js">server.<span class="hljs-title function_">compare</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;attribute name: &#x27;</span> + req.<span class="hljs-property">attribute</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;attribute value: &#x27;</span> + req.<span class="hljs-property">value</span>);
+  res.<span class="hljs-title function_">end</span>(req.<span class="hljs-property">value</span> === <span class="hljs-string">&#x27;foo&#x27;</span>);
 });
 </code></pre>
 <h2 id="comparerequest">CompareRequest</h2>
@@ -569,14 +569,14 @@ property).</p>
 that, there are no extra methods above an <code>LDAPResult</code> API call.</p>
 <h1 id="modifydn">modifyDN</h1>
 <p>Allows you to handle an LDAP modifyDN operation.</p>
-<pre><code class="language-js">server.modifyDN(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.dn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;new RDN: &#x27;</span> + req.newRdn.toString());
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;deleteOldRDN: &#x27;</span> + req.deleteOldRdn);
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;new superior: &#x27;</span> +
-    (req.newSuperior ? req.newSuperior.toString() : <span class="hljs-string">&#x27;&#x27;</span>));
+<pre><code class="language-js">server.<span class="hljs-title function_">modifyDN</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;DN: &#x27;</span> + req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;new RDN: &#x27;</span> + req.<span class="hljs-property">newRdn</span>.<span class="hljs-title function_">toString</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;deleteOldRDN: &#x27;</span> + req.<span class="hljs-property">deleteOldRdn</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;new superior: &#x27;</span> +
+    (req.<span class="hljs-property">newSuperior</span> ? req.<span class="hljs-property">newSuperior</span>.<span class="hljs-title function_">toString</span>() : <span class="hljs-string">&#x27;&#x27;</span>));
 
-  res.end();
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <h2 id="modifydnrequest">ModifyDNRequest</h2>
@@ -599,12 +599,12 @@ OID, but ldapjs makes no such restrictions; it just needs to be a string.
 Unlike the other operations, extended operations don&#39;t map to any location in
 the tree, so routing here will be exact match, as opposed to subtree.</p>
 <pre><code class="language-js"><span class="hljs-comment">// LDAP whoami</span>
-server.exop(<span class="hljs-string">&#x27;1.3.6.1.4.1.4203.1.11.3&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;name: &#x27;</span> + req.name);
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;value: &#x27;</span> + req.value);
-  res.value = <span class="hljs-string">&#x27;u:xxyyz@EXAMPLE.NET&#x27;</span>;
-  res.end();
-  <span class="hljs-keyword">return</span> next();
+server.<span class="hljs-title function_">exop</span>(<span class="hljs-string">&#x27;1.3.6.1.4.1.4203.1.11.3&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;name: &#x27;</span> + req.<span class="hljs-property">name</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;value: &#x27;</span> + req.<span class="hljs-property">value</span>);
+  res.<span class="hljs-property">value</span> = <span class="hljs-string">&#x27;u:xxyyz@EXAMPLE.NET&#x27;</span>;
+  res.<span class="hljs-title function_">end</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
 });
 </code></pre>
 <h2 id="extendedrequest">ExtendedRequest</h2>
@@ -624,8 +624,8 @@ operation.</p>
 and cleans up any internals (in ldapjs core).  You can override this handler
 if you need to clean up any items in your backend, or perform any other cleanup
 tasks you need to.</p>
-<pre><code class="language-js">server.unbind(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
-  res.end();
+<pre><code class="language-js">server.<span class="hljs-title function_">unbind</span>(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  res.<span class="hljs-title function_">end</span>();
 });
 </code></pre>
 <p>Note that the LDAP unbind operation actually doesn&#39;t send any response (by

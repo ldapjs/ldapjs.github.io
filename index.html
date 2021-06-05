@@ -69,29 +69,29 @@ with HTTP services in node and <a href="http://restify.com">restify</a>.</p>
 
 <pre><code class="language-js"><span class="hljs-keyword">const</span> ldap = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;ldapjs&#x27;</span>);
 
-<span class="hljs-keyword">const</span> server = ldap.createServer();
+<span class="hljs-keyword">const</span> server = ldap.<span class="hljs-title function_">createServer</span>();
 
-server.search(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+server.<span class="hljs-title function_">search</span>(<span class="hljs-string">&#x27;o=example&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
   <span class="hljs-keyword">const</span> obj = {
-    <span class="hljs-attr">dn</span>: req.dn.toString(),
+    <span class="hljs-attr">dn</span>: req.<span class="hljs-property">dn</span>.<span class="hljs-title function_">toString</span>(),
     <span class="hljs-attr">attributes</span>: {
       <span class="hljs-attr">objectclass</span>: [<span class="hljs-string">&#x27;organization&#x27;</span>, <span class="hljs-string">&#x27;top&#x27;</span>],
       <span class="hljs-attr">o</span>: <span class="hljs-string">&#x27;example&#x27;</span>
     }
   };
 
-  <span class="hljs-keyword">if</span> (req.filter.matches(obj.attributes))
-    res.send(obj);
+  <span class="hljs-keyword">if</span> (req.<span class="hljs-property">filter</span>.<span class="hljs-title function_">matches</span>(obj.<span class="hljs-property">attributes</span>))
+    res.<span class="hljs-title function_">send</span>(obj);
 
-  res.end();
+  res.<span class="hljs-title function_">end</span>();
 });
 
-server.listen(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
-  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">&#x27;LDAP server listening at %s&#x27;</span>, server.url);
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">1389</span>, <span class="hljs-function">() =&gt;</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;LDAP server listening at %s&#x27;</span>, server.<span class="hljs-property">url</span>);
 });
 </code></pre>
 <p>Try hitting that with:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -b o=example objectclass=*</span>
 </code></pre>
 <h1 id="features">Features</h1>
 <p>ldapjs implements most of the common operations in the LDAP v3 RFC(s), for
@@ -101,7 +101,7 @@ LDAPv3-compliant implementation.  ldapjs gives you a powerful routing and
 &quot;intercepting filter&quot; pattern for implementing server(s).  It is intended
 that you can build LDAP over anything you want, not just traditional databases.</p>
 <h1 id="getting-started">Getting started</h1>
-<pre><code class="language-shell"><span class="hljs-meta">$</span><span class="bash"> npm install ldapjs</span>
+<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">npm install ldapjs</span>
 </code></pre>
 <p>If you&#39;re new to LDAP, check out the <a href="guide.html">guide</a>.  Otherwise, the
 API documentation is:</p>
