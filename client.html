@@ -474,7 +474,7 @@ client.<span class="hljs-title function_">search</span>(<span class="hljs-string
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;searchRequest: &#x27;</span>, searchRequest.<span class="hljs-property">messageID</span>);
   });
   res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;entry: &#x27;</span> + <span class="hljs-variable constant_">JSON</span>.<span class="hljs-title function_">stringify</span>(entry.<span class="hljs-property">object</span>));
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;entry: &#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(entry.<span class="hljs-property">object</span>));
   });
   res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;searchReference&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">referral</span>) =&gt;</span> {
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;referral: &#x27;</span> + referral.<span class="hljs-property">uris</span>.<span class="hljs-title function_">join</span>());
