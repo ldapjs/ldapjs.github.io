@@ -208,6 +208,10 @@ that merely returns the passed in logger.</p>
 <li><a href="https://www.npmjs.com/package/bunyan">Bunyan</a></li>
 <li><a href="https://www.npmjs.com/package/pino">Pino</a></li>
 </ul>
+<h3 id="note-on-error-handling">Note On Error Handling</h3>
+<p>The client is an <code>EventEmitter</code>. If you don&#39;t register an error handler and
+e.g. a connection error occurs, Node.js will print a stack trace and exit the
+process (<a href="https://nodejs.org/api/events.html#error-events">reference</a>).</p>
 <h2 id="connection-management">Connection management</h2>
 <p>As LDAP is a stateful protocol (as opposed to HTTP), having connections torn
 down from underneath you can be difficult to deal with. Several mechanisms
