@@ -180,7 +180,7 @@ useful to you, then that&#39;s gravy.</p>
 <p>If you don&#39;t already have node.js and npm, clearly you need those, so follow
 the steps at <a href="http://nodejs.org">nodejs.org</a> and <a href="http://npmjs.org">npmjs.org</a>,
 respectively.  After that, run:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">npm install ldapjs</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">npm install ldapjs</span>
 </code></pre>
 <p>Rather than overload you with client-side programming for now, we&#39;ll use
 the OpenLDAP CLI to interact with our server.  It&#39;s almost certainly already
@@ -198,7 +198,7 @@ server.<span class="hljs-title function_">listen</span>(<span class="hljs-number
 </code></pre>
 <p>And run that.  Doing anything will give you errors (LDAP &quot;No Such Object&quot;)
 since we haven&#39;t added any support in yet, but go ahead and try it anyway:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 </code></pre>
 <p>Before we go any further, note that the complete code for the server we are
 about to build up is on the <a href="examples.html">examples</a> page.</p>
@@ -249,14 +249,14 @@ send the proper error code back to the client.</p>
 have one handler in the chain, but it&#39;s good habit to always do that, so if you
 add another handler in later you won&#39;t get bit by it not being invoked.</p>
 <p>Blah blah, let&#39;s try running the ldap client again, first with a bad password:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w foo -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 ldap_bind: Invalid credentials (49)
     matched DN: cn=root
     additional info: Invalid Credentials
 </code></pre>
 <p>And again with the correct one:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 
 No such object (32)
 Additional information: No tree found for: o=myhost
@@ -378,7 +378,7 @@ server.<span class="hljs-title function_">search</span>(<span class="hljs-string
 });
 </code></pre>
 <p>And try running:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 dn: cn=root, ou=users, o=myhost
 cn: root
 uid: 0
@@ -389,14 +389,14 @@ shell: /bin/sh
 objectclass: unixUser
 </code></pre>
 <p>Sweet! Try this out too:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> objectclass=*</span>
 ...
 </code></pre>
 <p>You should have seen an entry for every record in /etc/passwd with the second.
 What all did we do here?  A lot.  Let&#39;s break this down...</p>
 <h3 id="what-did-i-just-do-on-the-command-line">What did I just do on the command line?</h3>
 <p>Let&#39;s start with looking at what you even asked for:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> cn=root</span>
 </code></pre>
 <p>We can throw away <code>ldapsearch -H -x -D -w -LLL</code>, as those just specify the URL
 to connect to, the bind credentials and the <code>-LLL</code> just quiets down OpenLDAP.
@@ -447,7 +447,7 @@ LDAP server over riak.</p>
 shell set to <code>/bin/false</code> and whose name starts with <code>p</code> (I&#39;m doing this
 on Ubuntu).  Then, let&#39;s say we only care about their login name and primary
 group id.  We&#39;d do this:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> <span class="hljs-string">&quot;(&amp;(shell=/bin/false)(cn=p*))&quot;</span> cn gid</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -x -D cn=root -w secret -LLL -b <span class="hljs-string">&quot;o=myhost&quot;</span> <span class="hljs-string">&quot;(&amp;(shell=/bin/false)(cn=p*))&quot;</span> cn gid</span>
 dn: cn=proxy, ou=users, o=myhost
 cn: proxy
 gid: 13
@@ -529,11 +529,11 @@ shell: /bin/bash
 description: Created via ldapadd
 </code></pre>
 <p>Now go ahead and invoke with:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapadd -H ldap://localhost:1389 -x -D cn=root -w secret -f ./user.ldif</span>
 adding new entry &quot;cn=ldapjs, ou=users, o=myhost&quot;
 </code></pre>
 <p>Let&#39;s confirm he got added with an ldapsearch:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b <span class="hljs-string">&quot;ou=users, o=myhost&quot;</span> cn=ldapjs</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapsearch -H ldap://localhost:1389 -LLL -x -D cn=root -w secret -b <span class="hljs-string">&quot;ou=users, o=myhost&quot;</span> cn=ldapjs</span>
 dn: cn=ldapjs, ou=users, o=myhost
 cn: ldapjs
 uid: 1001
@@ -637,7 +637,7 @@ userPassword: secret
 -
 </code></pre>
 <p>And then run the OpenLDAP CLI:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapmodify -H ldap://localhost:1389 -x -D cn=root -w secret -f ./passwd.ldif</span>
 </code></pre>
 <p>You should now be able to login to your box as the ldapjs user. Let&#39;s get
 the last &quot;mainline&quot; piece of work out of the way, and delete the user.</p>
@@ -672,7 +672,7 @@ delete it :).  Add the following code into your server:</p>
 });
 </code></pre>
 <p>And then run the following command:</p>
-<pre><code class="language-shell"><span class="hljs-meta">$ </span><span class="language-bash">ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret <span class="hljs-string">&quot;cn=ldapjs, ou=users, o=myhost&quot;</span></span>
+<pre><code class="language-shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash">ldapdelete -H ldap://localhost:1389 -x -D cn=root -w secret <span class="hljs-string">&quot;cn=ldapjs, ou=users, o=myhost&quot;</span></span>
 </code></pre>
 <h1 id="where-to-go-from-here">Where to go from here</h1>
 <p>The complete source code for this example server is available in
