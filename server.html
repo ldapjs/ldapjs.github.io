@@ -276,8 +276,14 @@ available.</p>
 <h3 id="port-and-host">Port and Host</h3>
 <p><code>listen(port, [host], [callback])</code></p>
 <p>Begin accepting connections on the specified port and host. If the host is
-omitted, the server will accept connections directed to any IPv4 address
-(INADDR_ANY).</p>
+omitted, the server will accept connections directed to the IPv4 address
+<code>127.0.0.1</code>. To listen on any other address, supply said address as the <code>host</code>
+parameter. For example, to listen on all available IPv6 addresses supply
+<code>::</code> as the <code>host</code> (note, this <em>may</em> also result in listening on all
+available IPv4 addresses, depending on operating system behavior).</p>
+<p>We highly recommend being as explicit as possible with the <code>host</code> parameter.
+Listening on all available addresses (through <code>::</code> or <code>0.0.0.0</code>) can lead
+to potential security issues.</p>
 <p>This function is asynchronous. The last parameter callback will be called when
 the server has been bound.</p>
 <h3 id="unix-domain-socket">Unix Domain Socket</h3>
@@ -366,7 +372,7 @@ which will be an instance of an <code>ldap.DN</code> object.  This is what the c
 authenticated as on this connection. If the client didn&#39;t bind, then a DN object
 will be there defaulted to <code>cn=anonymous</code>.</p>
 <p>Additionally, request will have a <code>logId</code> parameter you can use to uniquely
-identify the request/connection pair in logs (includes the LDAP messageID).</p>
+identify the request/connection pair in logs (includes the LDAP messageId).</p>
 <h2 id="common-response-elements">Common Response Elements</h2>
 <p>All response objects will have an <code>end</code> method on them.  By default, calling
 <code>res.end()</code> with no arguments will return SUCCESS (0x00) to the client

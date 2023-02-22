@@ -140,7 +140,7 @@ with LDAP. If you&#39;re not, read the <a href="guide.html">guide</a> first.</p>
   <span class="hljs-attr">url</span>: [<span class="hljs-string">&#x27;ldap://127.0.0.1:1389&#x27;</span>, <span class="hljs-string">&#x27;ldap://127.0.0.2:1389&#x27;</span>]
 });
 
-client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+client.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;connectError&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
   <span class="hljs-comment">// handle connection error</span>
 })
 </code></pre>
@@ -182,10 +182,6 @@ client is:</p>
 <tr>
 <td>idleTimeout</td>
 <td>Milliseconds after last activity before client emits idle event</td>
-</tr>
-<tr>
-<td>strictDN</td>
-<td>Force strict DN parsing for client methods (Default is true)</td>
 </tr>
 <tr>
 <td>reconnect</td>
@@ -459,7 +455,7 @@ containing the following fields:</p>
 each <code>searchEntry</code> that comes back from the server. You will additionally be able to listen for a <code>searchRequest</code>
 , <code>searchReference</code>, <code>error</code> and <code>end</code> event.
 <code>searchRequest</code> is emitted immediately after every <code>SearchRequest</code> is sent with a <code>SearchRequest</code> parameter. You can do operations
-like <code>client.abandon</code> with <code>searchRequest.messageID</code> to abandon this search request. Note that the <code>error</code> event will
+like <code>client.abandon</code> with <code>searchRequest.messageId</code> to abandon this search request. Note that the <code>error</code> event will
 only be for client/TCP errors, not LDAP error codes like the other APIs. You&#39;ll want to check the LDAP status code
 (likely for <code>0</code>) on the <code>end</code> event to assert success. LDAP search results can give you a lot of status codes, such as
 time or size exceeded, busy, inappropriate matching, etc., which is why this method doesn&#39;t try to wrap up the code
@@ -475,7 +471,7 @@ client.<span class="hljs-title function_">search</span>(<span class="hljs-string
   assert.<span class="hljs-title function_">ifError</span>(err);
 
   res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;searchRequest&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">searchRequest</span>) =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;searchRequest: &#x27;</span>, searchRequest.<span class="hljs-property">messageID</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;searchRequest: &#x27;</span>, searchRequest.<span class="hljs-property">messageId</span>);
   });
   res.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;searchEntry&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">entry</span>) =&gt;</span> {
     <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;entry: &#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(entry.<span class="hljs-property">object</span>));
