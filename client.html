@@ -355,7 +355,8 @@ pass in a single <code>Change</code> or an array of <code>Change</code> objects.
 <pre><code class="language-js"><span class="hljs-keyword">const</span> change = <span class="hljs-keyword">new</span> ldap.<span class="hljs-title class_">Change</span>({
   <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;add&#x27;</span>,
   <span class="hljs-attr">modification</span>: {
-    <span class="hljs-attr">pets</span>: [<span class="hljs-string">&#x27;cat&#x27;</span>, <span class="hljs-string">&#x27;dog&#x27;</span>]
+    <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;pets&#x27;</span>,
+    <span class="hljs-attr">values</span>: [<span class="hljs-string">&#x27;cat&#x27;</span>, <span class="hljs-string">&#x27;dog&#x27;</span>]
   }
 });
 
@@ -387,7 +388,23 @@ must be one of:</p>
 <td>Deletes the attribute (and all values) referenced in <code>modification</code>.</td>
 </tr>
 </tbody></table>
-<p><code>modification</code> is just a plain old JS object with the values you want.</p>
+<p><code>modification</code> is just a plain old JS object with the required type and values you want.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>type</td>
+<td>String that defines the attribute type for the modification.</td>
+</tr>
+<tr>
+<td>values</td>
+<td>Defines the values for modification.</td>
+</tr>
+</tbody></table>
 <h1 id="modifydn">modifyDN</h1>
 <p><code>modifyDN(dn, newDN, controls, callback)</code></p>
 <p>Performs an LDAP modifyDN (rename) operation against an entry in the LDAP
